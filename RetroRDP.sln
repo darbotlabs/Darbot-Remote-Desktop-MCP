@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B60D6F04-0D3D-40F2-BBC0-37C5781A0543}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClientApp", "ClientApp", "{43054256-6ECE-4FED-8552-32F29200736A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetroRDPClient", "src\ClientApp\RetroRDPClient\RetroRDPClient.csproj", "{906A1112-7070-40DA-9EAE-CA32112A1E56}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{F2FE22D5-06F0-413C-A073-D343115433D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetroRDPWeb", "src\WebApp\RetroRDPWeb\RetroRDPWeb.csproj", "{5E74DC35-0563-4268-BD92-65A55539E83B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{4CE5DF08-16F5-4E3E-988C-7E0D7D0832F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetroRDP.Shared", "src\Shared\RetroRDP.Shared\RetroRDP.Shared.csproj", "{150A748C-793F-470D-9E51-FDD33322D863}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{906A1112-7070-40DA-9EAE-CA32112A1E56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{906A1112-7070-40DA-9EAE-CA32112A1E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{906A1112-7070-40DA-9EAE-CA32112A1E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{906A1112-7070-40DA-9EAE-CA32112A1E56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E74DC35-0563-4268-BD92-65A55539E83B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E74DC35-0563-4268-BD92-65A55539E83B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E74DC35-0563-4268-BD92-65A55539E83B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E74DC35-0563-4268-BD92-65A55539E83B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{150A748C-793F-470D-9E51-FDD33322D863}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{150A748C-793F-470D-9E51-FDD33322D863}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{150A748C-793F-470D-9E51-FDD33322D863}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{150A748C-793F-470D-9E51-FDD33322D863}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{43054256-6ECE-4FED-8552-32F29200736A} = {B60D6F04-0D3D-40F2-BBC0-37C5781A0543}
+		{906A1112-7070-40DA-9EAE-CA32112A1E56} = {43054256-6ECE-4FED-8552-32F29200736A}
+		{F2FE22D5-06F0-413C-A073-D343115433D6} = {B60D6F04-0D3D-40F2-BBC0-37C5781A0543}
+		{5E74DC35-0563-4268-BD92-65A55539E83B} = {F2FE22D5-06F0-413C-A073-D343115433D6}
+		{4CE5DF08-16F5-4E3E-988C-7E0D7D0832F0} = {B60D6F04-0D3D-40F2-BBC0-37C5781A0543}
+		{150A748C-793F-470D-9E51-FDD33322D863} = {4CE5DF08-16F5-4E3E-988C-7E0D7D0832F0}
+	EndGlobalSection
+EndGlobal

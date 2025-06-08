@@ -1,0 +1,6 @@
+@RetroRDPWeb_HostAddress = http://localhost:5128
+
+GET {{RetroRDPWeb_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
