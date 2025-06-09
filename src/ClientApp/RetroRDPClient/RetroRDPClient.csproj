@@ -9,4 +9,10 @@
     <AssemblyDescription>Modern retro-futuristic multi-session Remote Desktop client</AssemblyDescription>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="WPF\**" />
+    <EmbeddedResource Remove="WPF\**" />
+    <None Remove="WPF\**" />
+  </ItemGroup>
+
 </Project>
