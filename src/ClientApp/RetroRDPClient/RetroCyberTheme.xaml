@@ -100,4 +100,145 @@
         <Setter Property="Foreground" Value="{StaticResource CyberGradientBrush}"/>
     </Style>
 
+    <!-- TextBox Style -->
+    <Style x:Key="CyberTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource CyberDarkGrayBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontFamily" Value="{StaticResource CyberFont}"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="CaretBrush" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="SelectionBrush" Value="{StaticResource CyberNeonMagentaBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="3">
+                        <ScrollViewer x:Name="PART_ContentHost" 
+                                      Focusable="false" 
+                                      HorizontalScrollBarVisibility="Hidden" 
+                                      VerticalScrollBarVisibility="Hidden"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource CyberNeonPinkBrush}"/>
+                            <Setter Property="Effect" Value="{StaticResource CyberNeonGlowPink}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- TabControl Style -->
+    <Style x:Key="CyberTabControl" TargetType="TabControl">
+        <Setter Property="Background" Value="{StaticResource CyberBlackBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontFamily" Value="{StaticResource CyberFont}"/>
+    </Style>
+
+    <!-- TabItem Style -->
+    <Style x:Key="CyberTabItem" TargetType="TabItem">
+        <Setter Property="Background" Value="{StaticResource CyberDarkGrayBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource CyberFont}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border Name="Border" 
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1,1,1,0"
+                            CornerRadius="4,4,0,0"
+                            Margin="0,0,2,0">
+                        <ContentPresenter x:Name="ContentSite"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"
+                                          ContentSource="Header"
+                                          Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource CyberGrayBrush}"/>
+                            <Setter TargetName="Border" Property="Effect" Value="{StaticResource CyberNeonGlow}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource CyberGrayBrush}"/>
+                            <Setter TargetName="Border" Property="Effect" Value="{StaticResource CyberNeonGlowPink}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ListBox Style -->
+    <Style x:Key="CyberListBox" TargetType="ListBox">
+        <Setter Property="Background" Value="{StaticResource CyberBlackBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontFamily" Value="{StaticResource CyberFont}"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+    </Style>
+
+    <!-- ListBoxItem Style -->
+    <Style x:Key="CyberListBoxItem" TargetType="ListBoxItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="FontFamily" Value="{StaticResource CyberFont}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderThickness="0"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource CyberDarkGrayBrush}"/>
+                            <Setter Property="Effect" Value="{StaticResource CyberNeonGlow}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{StaticResource CyberGrayBrush}"/>
+                            <Setter Property="Effect" Value="{StaticResource CyberNeonGlowPink}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ScrollBar Styles for dark theme -->
+    <Style x:Key="CyberScrollBar" TargetType="ScrollBar">
+        <Setter Property="Background" Value="{StaticResource CyberDarkGrayBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="Width" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid>
+                        <Rectangle Fill="{TemplateBinding Background}"/>
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb Background="{StaticResource CyberNeonCyanBrush}" 
+                                       BorderBrush="{StaticResource CyberNeonCyanBrush}"/>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
