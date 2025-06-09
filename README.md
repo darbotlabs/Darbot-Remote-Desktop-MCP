@@ -1,6 +1,6 @@
 # Retro Cyber Remote Desktop Client
 
-A modern, retro-futuristic multi-session Remote Desktop client for Windows, built with .NET and featuring an extensive agentic AI framework.
+A modern, retro-futuristic multi-session Remote Desktop client for Windows, built with .NET and featuring an extensive agentic AI framework with **Windows Foundry Local** and **Microsoft Phi-4** model support.
 
 ## Project Overview
 
@@ -8,7 +8,8 @@ This application serves as a modern successor to Microsoft's retired Remote Desk
 - **Retro Cyber Aesthetics**: Dark theme with neon color palette and cyberpunk elements
 - **Modern Fluent Design**: Windows 11 design principles with acrylic/mica materials
 - **Multi-Session Support**: Tabbed interface for managing multiple RDP connections
-- **AI Integration**: Agentic AI assistant for natural language remote session management
+- **Local AI Integration**: Offline AI assistant powered by Microsoft Phi-4 models
+- **Windows Foundry Local**: Privacy-first local AI without internet dependency
 
 ## Architecture
 
@@ -47,7 +48,12 @@ This application serves as a modern successor to Microsoft's retired Remote Desk
    dotnet run --project src/ClientApp/RetroRDPClient
    ```
 
-5. Run the web API (optional):
+5. *(Optional)* Set up local AI with Phi-4 models:
+   - Download Phi-4 ONNX models from Microsoft or Hugging Face
+   - Place models in `src/ClientApp/RetroRDPClient/Models/` directory
+   - See [Windows Foundry Local Setup Guide](docs/Windows-Foundry-Local-Setup.md) for detailed instructions
+
+6. Run the web API (optional):
    ```bash
    dotnet run --project src/WebApp/RetroRDPWeb
    ```
@@ -64,7 +70,7 @@ This project has completed **Level 1: Project Setup and Planning** phase and is 
 - ✅ Comprehensive project documentation and architecture planning
 - ✅ Cross-platform build validation (.NET 8)
 
-### ✅ Level 2 Complete - User Interface – Retro Fluent Experience
+### ✅ Level 2 Complete - User Interface – Retro Fluent Experience with Local AI
 - ✅ WPF application with comprehensive retro cyber theme
 - ✅ Main window Grid layout (20% sidebar + 80% main area with splitter)
 - ✅ Copilot-style left sidebar with AI AssistBot interface
@@ -76,6 +82,9 @@ This project has completed **Level 1: Project Setup and Planning** phase and is 
 - ✅ Responsive UI with window resizing support
 - ✅ Full interaction handling and error management
 - ✅ Cross-platform build compatibility (WPF files in separate directory)
+- ✅ **Windows Foundry Local integration** with Microsoft Phi-4 model support
+- ✅ **Offline AI capabilities** for privacy-first intelligent assistance
+- ✅ **Enhanced AI assistant** with intelligent RDP guidance and troubleshooting
 
 ### ⏳ Level 3 Planned - Multi-Session RDP Functionality
 - ⏳ Actual RDP protocol integration

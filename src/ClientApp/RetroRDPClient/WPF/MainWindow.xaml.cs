@@ -2,25 +2,65 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Microsoft.Extensions.Logging;
+using RetroRDPClient.Services;
 
 namespace RetroRDPClient
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// WPF Main Window - only used when deployed on Windows
+    /// Features local AI integration with Phi-4 model support
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly ILocalAIService _aiService;
+        private readonly ILogger<MainWindow>? _logger;
+
         public MainWindow()
         {
             InitializeComponent();
+            
+            // Initialize logging (simple console logger for now)
+            _logger = LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger<MainWindow>();
+            
+            // Initialize Local AI Service
+            _aiService = new LocalAIService(_logger != null ? 
+                LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger<LocalAIService>() : 
+                null);
             
             // Set up initial state
             CommandInput.Text = "Type your command here...";
             CommandInput.Foreground = System.Windows.Media.Brushes.Gray;
             
-            // Add some sample chat messages to demonstrate the interface
-            AddWelcomeMessages();
+            // Initialize AI service and add welcome messages
+            InitializeAIServiceAsync();
+        }
+
+        private async void InitializeAIServiceAsync()
+        {
+            try
+            {
+                var success = await _aiService.InitializeAsync();
+                if (success)
+                {
+                    AddWelcomeMessages();
+                    AddChatMessage($"🤖 AssistBot: Local AI service initialized successfully! Running: {_aiService.CurrentModelName}", isUser: false);
+                    _logger?.LogInformation("AI service initialized successfully");
+                }
+                else
+                {
+                    AddWelcomeMessages();
+                    AddChatMessage("🤖 AssistBot: AI service initialization failed. Using basic fallback mode.", isUser: false);
+                    _logger?.LogWarning("AI service initialization failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error initializing AI service");
+                AddWelcomeMessages();
+                AddChatMessage("🤖 AssistBot: Welcome! I'm running in safe mode and ready to help with your RDP needs.", isUser: false);
+            }
         }
 
         private void AddWelcomeMessages()
@@ -53,7 +93,7 @@ namespace RetroRDPClient
             SendCommand();
         }
 
-        private void SendCommand()
+        private async void SendCommand()
         {
             string command = CommandInput.Text.Trim();
             
@@ -68,8 +108,17 @@ namespace RetroRDPClient
             // Clear input
             CommandInput.Text = "";
             
-            // Simulate AI response (placeholder for future AI integration)
-            AddChatMessage($"🤖 AssistBot: Command received: '{command}'. RDP functionality will be implemented in future levels.", isUser: false);
+            try
+            {
+                // Use local AI service to generate response
+                var response = await _aiService.GenerateResponseAsync(command);
+                AddChatMessage(response, isUser: false);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error generating AI response");
+                AddChatMessage($"🤖 AssistBot: I encountered an error processing your request: {ex.Message}. Please try again.", isUser: false);
+            }
         }
 
         private void AddChatMessage(string message, bool isUser)
@@ -146,6 +195,13 @@ namespace RetroRDPClient
             // This is a placeholder for Fluent design effects
             // In a real implementation, you would use Windows 11 APIs
             // For now, we'll rely on the gradient background for the effect
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            // Clean up AI service resources
+            _aiService?.Dispose();
+            base.OnClosed(e);
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

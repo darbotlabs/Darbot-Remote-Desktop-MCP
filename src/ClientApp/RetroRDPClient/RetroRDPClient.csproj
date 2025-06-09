@@ -10,6 +10,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Local AI and ML dependencies -->
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.16.3" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="9.5.0" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <!-- For tokenization and text processing -->
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.21.0" />
+    <PackageReference Include="TikToken" Version="1.1.5" />
+    <!-- For tensor operations -->
+    <PackageReference Include="System.Numerics.Tensors" Version="9.0.0" />
+    <!-- For JSON handling - use latest version to avoid security vulnerabilities -->
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="WPF\**" />
     <EmbeddedResource Remove="WPF\**" />
     <None Remove="WPF\**" />
