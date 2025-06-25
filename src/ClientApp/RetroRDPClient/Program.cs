@@ -1,12 +1,50 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace RetroRDPClient
 {
-    // Console application for cross-platform compatibility
-    // WPF version available in the XAML files for Windows deployment
+    // Cross-platform application entry point
+    // Console version for cross-platform compatibility
+    // WPF version runs automatically on Windows
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
+        {
+            // On Windows, attempt to start the WPF application if available
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                try
+                {
+                    // Try to create WPF app using reflection to avoid compilation errors on non-Windows
+                    var appType = Type.GetType("RetroRDPClient.App");
+                    if (appType != null)
+                    {
+                        var app = Activator.CreateInstance(appType);
+                        var initMethod = appType.GetMethod("InitializeComponent");
+                        var runMethod = appType.GetMethod("Run", Type.EmptyTypes);
+                        
+                        initMethod?.Invoke(app, null);
+                        runMethod?.Invoke(app, null);
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("WPF Application class not found. Building on non-Windows platform?");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to start WPF application: {ex.Message}");
+                    Console.WriteLine("Falling back to console mode...");
+                }
+            }
+
+            // Console mode for non-Windows platforms or testing
+            ShowConsoleVersion();
+        }
+
+        static void ShowConsoleVersion()
         {
             // Display retro cyber theme banner in console
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -47,8 +85,15 @@ namespace RetroRDPClient
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("    Note: This console version shows the implementation status.");
-            Console.WriteLine("    Deploy to Windows with WPF to see the full interface!");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Console.WriteLine("    Windows detected: WPF UI will launch automatically!");
+            }
+            else
+            {
+                Console.WriteLine("    Note: This console version shows the implementation status.");
+                Console.WriteLine("    Deploy to Windows with WPF to see the full interface!");
+            }
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Green;

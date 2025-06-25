@@ -9,6 +9,14 @@
     <AssemblyDescription>Modern retro-futuristic multi-session Remote Desktop client</AssemblyDescription>
   </PropertyGroup>
 
+  <!-- Windows-specific configuration for WPF -->
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ApplicationIcon>WPF\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- Local AI and ML dependencies -->
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.16.3" />
@@ -26,10 +34,35 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- Cross-platform: exclude WPF files on non-Windows platforms -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
     <Compile Remove="WPF\**" />
     <EmbeddedResource Remove="WPF\**" />
     <None Remove="WPF\**" />
+  </ItemGroup>
+
+  <!-- Windows: include WPF files and theme resources -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <ApplicationDefinition Include="WPF\App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="WPF\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RetroCyberTheme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="WPF\App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WPF\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>
