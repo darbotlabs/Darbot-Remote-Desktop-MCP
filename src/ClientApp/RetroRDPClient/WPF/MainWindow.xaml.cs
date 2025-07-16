@@ -74,7 +74,16 @@ namespace RetroRDPClient
             if (CommandInput.Text == "Type your command here...")
             {
                 CommandInput.Text = "";
-                CommandInput.Foreground = (System.Windows.Media.Brush)FindResource("CyberNeonCyanBrush");
+                var brushResource = TryFindResource("CyberNeonCyanBrush");
+                if (brushResource is System.Windows.Media.Brush brush)
+                {
+                    CommandInput.Foreground = brush;
+                }
+                else
+                {
+                    CommandInput.Foreground = System.Windows.Media.Brushes.Black; // Fallback brush
+                    _logger?.LogWarning("Resource 'CyberNeonCyanBrush' is missing or not a Brush.");
+                }
             }
         }
 
