@@ -8,7 +8,7 @@
         MinWidth="900"
         Style="{StaticResource CyberWindow}"
         WindowStartupLocation="CenterScreen"
-        Icon="pack://application:,,,/RetroRDPClient;component/icon.ico">
+        Icon="pack://application:,,,/RetroRDPClient;component/WPF/icon.ico">
     
     <Window.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1" Opacity="0.95">
