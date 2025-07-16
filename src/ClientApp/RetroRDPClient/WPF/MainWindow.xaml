@@ -1,0 +1,335 @@
+﻿<Window x:Class="RetroRDPClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🎮 Retro Cyber RDP Client" 
+        Height="800" 
+        Width="1200"
+        MinHeight="600"
+        MinWidth="900"
+        Style="{StaticResource CyberWindow}"
+        WindowStartupLocation="CenterScreen"
+        Icon="pack://application:,,,/RetroRDPClient;component/WPF/icon.ico">
+    
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1" Opacity="0.95">
+            <GradientStop Color="{StaticResource CyberBlack}" Offset="0"/>
+            <GradientStop Color="{StaticResource CyberDarkGray}" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid>
+        <!-- Main layout: Sidebar (20%) + Main Content (80%) -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" MinWidth="250"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Sidebar - AI Assistant / Navigation -->
+        <Border Grid.Column="0" 
+                Background="{StaticResource CyberDarkGrayBrush}"
+                BorderBrush="{StaticResource CyberNeonCyanBrush}"
+                BorderThickness="0,0,1,0"
+                Effect="{StaticResource CyberNeonGlow}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Sidebar Header -->
+                <StackPanel Grid.Row="0" Margin="15,20,15,10">
+                    <TextBlock Text="🤖 ASSISTBOT" 
+                               Style="{StaticResource CyberText}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource CyberNeonGreenBrush}"
+                               Effect="{StaticResource CyberNeonGlow}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Ready to help with commands..." 
+                               Style="{StaticResource CyberText}"
+                               FontSize="12"
+                               Margin="0,5,0,0"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"
+                               Opacity="0.8"/>
+                </StackPanel>
+
+                <!-- Chat/Assistant Area -->
+                <ScrollViewer Grid.Row="1" 
+                              Margin="10,0,10,10"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="ChatPanel">
+                        <!-- Welcome Messages -->
+                        <Border Background="{StaticResource CyberGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonCyanBrush}"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Margin="0,0,0,10"
+                                Padding="10">
+                            <TextBlock Text="🚀 Welcome to Retro Cyber RDP!"
+                                       Style="{StaticResource CyberText}"
+                                       FontSize="11"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+                        
+                        <Border Background="{StaticResource CyberGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonGreenBrush}"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Margin="0,0,0,10"
+                                Padding="10">
+                            <TextBlock Text="Type commands or ask questions about RDP sessions. I can help you connect, manage, and troubleshoot remote desktop connections."
+                                       Style="{StaticResource CyberText}"
+                                       FontSize="11"
+                                       Foreground="{StaticResource CyberNeonGreenBrush}"
+                                       TextWrapping="Wrap"/>
+                        </Border>
+
+                        <!-- Navigation Menu -->
+                        <TextBlock Text="🔧 QUICK ACTIONS" 
+                                   Style="{StaticResource CyberText}"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Margin="0,10,0,5"/>
+                        
+                        <ListBox x:Name="NavigationList"
+                                 Style="{StaticResource CyberListBox}"
+                                 BorderThickness="0"
+                                 Background="Transparent">
+                            <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="🖥️ New RDP Session"/>
+                            <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="📋 Saved Connections"/>
+                            <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="⚙️ Settings"/>
+                            <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="📊 Performance Monitor"/>
+                            <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="🔒 Security Status"/>
+                        </ListBox>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Input Area -->
+                <Grid Grid.Row="2" Margin="10,0,10,15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBox x:Name="CommandInput"
+                             Grid.Row="0"
+                             Style="{StaticResource CyberTextBox}"
+                             Margin="0,0,0,8"
+                             Height="60"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto"
+                             Text="Type your command here..."
+                             Foreground="{StaticResource CyberNeonCyanBrush}"
+                             GotFocus="CommandInput_GotFocus"
+                             KeyDown="CommandInput_KeyDown"/>
+                    
+                    <Button x:Name="SendButton"
+                            Grid.Row="1"
+                            Style="{StaticResource CyberButton}"
+                            Content="⚡ SEND COMMAND"
+                            HorizontalAlignment="Stretch"
+                            Click="SendButton_Click"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Splitter -->
+        <GridSplitter Grid.Column="1" 
+                      Width="5"
+                      Background="{StaticResource CyberNeonCyanBrush}"
+                      Opacity="0.3"
+                      HorizontalAlignment="Stretch"/>
+
+        <!-- Main Content Area - Tabbed RDP Sessions -->
+        <Border Grid.Column="2" 
+                Background="{StaticResource CyberBlackBrush}"
+                Margin="5,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0" 
+                        Background="{StaticResource CyberDarkGrayBrush}"
+                        BorderBrush="{StaticResource CyberNeonCyanBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="20,15">
+                    <StackPanel>
+                        <TextBlock Text="🎗️ REMOTE DESKTOP SESSIONS" 
+                                   Style="{StaticResource CyberTitle}"
+                                   FontSize="24"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Multi-Session RDP Client with AI Assistant" 
+                                   Style="{StaticResource CyberText}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,5,0,0"
+                                   Opacity="0.7"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Tabbed Sessions -->
+                <TabControl x:Name="SessionTabs"
+                            Grid.Row="1"
+                            Style="{StaticResource CyberTabControl}"
+                            Margin="10">
+                    
+                    <!-- Sample Tab 1 -->
+                    <TabItem Header="🖥️ Session 1" Style="{StaticResource CyberTabItem}">
+                        <Border Background="{StaticResource CyberDarkGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonCyanBrush}"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Margin="10">
+                            <Grid>
+                                <StackPanel HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="🖥️ Remote Desktop Session View Here" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="20"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,0,0,20"/>
+                                    
+                                    <TextBlock Text="Connection Status: Disconnected" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="14"
+                                               Foreground="{StaticResource CyberNeonYellowBrush}"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,0,0,10"/>
+                                    
+                                    <Button Style="{StaticResource CyberButton}"
+                                            Content="🔌 CONNECT"
+                                            Padding="20,8"
+                                            Margin="0,10"/>
+                                </StackPanel>
+                                
+                                <!-- Session info overlay -->
+                                <StackPanel HorizontalAlignment="Right" 
+                                            VerticalAlignment="Top"
+                                            Margin="20">
+                                    <TextBlock Text="Server: demo.server.com" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="10"
+                                               Opacity="0.7"/>
+                                    <TextBlock Text="User: Administrator" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="10"
+                                               Opacity="0.7"/>
+                                    <TextBlock Text="Resolution: 1920x1080" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="10"
+                                               Opacity="0.7"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </TabItem>
+
+                    <!-- Sample Tab 2 -->
+                    <TabItem Header="🖥️ Session 2" Style="{StaticResource CyberTabItem}">
+                        <Border Background="{StaticResource CyberDarkGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonMagentaBrush}"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Margin="10">
+                            <Grid>
+                                <StackPanel HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="🖥️ Remote Desktop Session View Here" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="20"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,0,0,20"/>
+                                    
+                                    <TextBlock Text="Connection Status: Connected" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="14"
+                                               Foreground="{StaticResource CyberNeonGreenBrush}"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,0,0,10"/>
+                                    
+                                    <Button Style="{StaticResource CyberButton}"
+                                            Content="🔌 DISCONNECT"
+                                            Padding="20,8"
+                                            Margin="0,10"/>
+                                </StackPanel>
+                                
+                                <!-- Session info overlay -->
+                                <StackPanel HorizontalAlignment="Right" 
+                                            VerticalAlignment="Top"
+                                            Margin="20">
+                                    <TextBlock Text="Server: production.server.com" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="10"
+                                               Opacity="0.7"/>
+                                    <TextBlock Text="User: Developer" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="10"
+                                               Opacity="0.7"/>
+                                    <TextBlock Text="Resolution: 2560x1440" 
+                                               Style="{StaticResource CyberText}"
+                                               FontSize="10"
+                                               Opacity="0.7"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </TabItem>
+
+                    <!-- Add New Session Tab -->
+                    <TabItem Header="➕ New Session" Style="{StaticResource CyberTabItem}">
+                        <Border Background="{StaticResource CyberDarkGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonGreenBrush}"
+                                BorderThickness="1"
+                                CornerRadius="5"
+                                Margin="10">
+                            <StackPanel HorizontalAlignment="Center" 
+                                        VerticalAlignment="Center"
+                                        MaxWidth="400">
+                                <TextBlock Text="🚀 Create New RDP Session" 
+                                           Style="{StaticResource CyberText}"
+                                           FontSize="18"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,30"/>
+                                
+                                <StackPanel Margin="0,0,0,15">
+                                    <TextBlock Text="Server Address:" 
+                                               Style="{StaticResource CyberText}"
+                                               Margin="0,0,0,5"/>
+                                    <TextBox Style="{StaticResource CyberTextBox}"
+                                             Text="192.168.1.100"/>
+                                </StackPanel>
+                                
+                                <StackPanel Margin="0,0,0,15">
+                                    <TextBlock Text="Username:" 
+                                               Style="{StaticResource CyberText}"
+                                               Margin="0,0,0,5"/>
+                                    <TextBox Style="{StaticResource CyberTextBox}"
+                                             Text="Administrator"/>
+                                </StackPanel>
+                                
+                                <StackPanel Margin="0,0,0,25">
+                                    <TextBlock Text="Session Name:" 
+                                               Style="{StaticResource CyberText}"
+                                               Margin="0,0,0,5"/>
+                                    <TextBox Style="{StaticResource CyberTextBox}"
+                                             Text="New Session"/>
+                                </StackPanel>
+                                
+                                <Button Style="{StaticResource CyberButton}"
+                                        Content="⚡ CREATE SESSION"
+                                        Padding="25,10"
+                                        HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
