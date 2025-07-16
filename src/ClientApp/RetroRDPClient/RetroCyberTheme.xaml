@@ -241,4 +241,136 @@
         </Setter>
     </Style>
 
+    <!-- PasswordBox Style -->
+    <Style x:Key="CyberPasswordBox" TargetType="PasswordBox">
+        <Setter Property="Background" Value="{StaticResource CyberGrayBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="FontFamily" Value="Consolas, Monaco, 'Courier New'"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Height" Value="35"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="PasswordBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="3">
+                        <ScrollViewer x:Name="PART_ContentHost" 
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource CyberNeonPinkBrush}"/>
+                            <Setter Property="Effect" Value="{StaticResource CyberNeonGlow}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource CyberNeonGreenBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ComboBox Style -->
+    <Style x:Key="CyberComboBox" TargetType="ComboBox">
+        <Setter Property="Background" Value="{StaticResource CyberGrayBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="FontFamily" Value="Consolas, Monaco, 'Courier New'"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Height" Value="35"/>
+    </Style>
+
+    <!-- CheckBox Style -->
+    <Style x:Key="CyberCheckBox" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="FontFamily" Value="Consolas, Monaco, 'Courier New'"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Margin" Value="0,5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal">
+                        <Border x:Name="CheckBorder"
+                                Background="{StaticResource CyberGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonCyanBrush}"
+                                BorderThickness="1"
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,8,0">
+                            <Path x:Name="CheckMark"
+                                  Data="M 0 4 L 4 8 L 12 0"
+                                  Stroke="{StaticResource CyberNeonGreenBrush}"
+                                  StrokeThickness="2"
+                                  Visibility="Collapsed"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource CyberDarkGrayBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource CyberNeonPinkBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Expander Style -->
+    <Style x:Key="CyberExpander" TargetType="Expander">
+        <Setter Property="Foreground" Value="{StaticResource CyberNeonCyanBrush}"/>
+        <Setter Property="FontFamily" Value="Consolas, Monaco, 'Courier New'"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Margin" Value="0,5"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Expander">
+                    <StackPanel>
+                        <Border Background="{StaticResource CyberDarkGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonCyanBrush}"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="8">
+                            <ToggleButton x:Name="HeaderSite"
+                                          IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Content="{TemplateBinding Header}"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          FontFamily="{TemplateBinding FontFamily}"
+                                          FontSize="{TemplateBinding FontSize}"
+                                          HorizontalAlignment="Stretch"/>
+                        </Border>
+                        <Border x:Name="ContentSite"
+                                Background="{StaticResource CyberGrayBrush}"
+                                BorderBrush="{StaticResource CyberNeonCyanBrush}"
+                                BorderThickness="1,0,1,1"
+                                CornerRadius="0,0,3,3"
+                                Visibility="Collapsed">
+                            <ContentPresenter Content="{TemplateBinding Content}"/>
+                        </Border>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="ContentSite" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

@@ -13,6 +13,7 @@
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <TargetFramework>net8.0-windows</TargetFramework>
     <ApplicationIcon>WPF\icon.ico</ApplicationIcon>
   </PropertyGroup>
@@ -34,6 +35,27 @@
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
+  <!-- Project references -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\RetroRDP.Shared\RetroRDP.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Windows-specific RDP dependencies -->
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <!-- Windows Forms Integration for ActiveX controls -->
+    <Reference Include="System.Windows.Forms" />
+    <!-- COM reference for RDP ActiveX control -->
+    <COMReference Include="MSTSCLib">
+      <Guid>93E9876A-8E4A-4CC4-A47C-6AC36F8FD926</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
   <!-- Cross-platform: exclude WPF files on non-Windows platforms -->
   <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
     <Compile Remove="WPF\**" />
@@ -51,6 +73,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="WPF\ConnectionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="RetroCyberTheme.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -61,6 +87,10 @@
     </Compile>
     <Compile Include="WPF\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WPF\ConnectionDialog.xaml.cs">
+      <DependentUpon>ConnectionDialog.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
