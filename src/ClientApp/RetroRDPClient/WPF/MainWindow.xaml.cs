@@ -22,11 +22,12 @@ namespace RetroRDPClient
             InitializeComponent();
             
             // Initialize logging (simple console logger for now)
-            _logger = LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger<MainWindow>();
+            var loggerFactory = LoggerFactory.Create(builder => builder.AddDebug());
+            _logger = loggerFactory.CreateLogger<MainWindow>();
             
             // Initialize Local AI Service
             _aiService = new LocalAIService(_logger != null ? 
-                LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger<LocalAIService>() : 
+                loggerFactory.CreateLogger<LocalAIService>() : 
                 null);
             
             // Set up initial state
