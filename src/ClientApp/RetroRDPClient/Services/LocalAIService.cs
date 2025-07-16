@@ -283,7 +283,7 @@ Keep responses concise, helpful, and maintain the retro-cyber theme when appropr
                        "📊 **Local**: Runs entirely on your Windows device\n" +
                        "📊 **ONNX**: Optimized for inference with ONNX Runtime\n" +
                        "📊 **Efficient**: Designed for edge computing scenarios\n\n" +
-                       "To use Phi-4 models, place .onnx files in the Models folder. Currently running: {CurrentModelName}";
+                       $"To use Phi-4 models, place .onnx files in the Models folder. Currently running: {CurrentModelName}";
             }
 
             // Default response with context awareness
