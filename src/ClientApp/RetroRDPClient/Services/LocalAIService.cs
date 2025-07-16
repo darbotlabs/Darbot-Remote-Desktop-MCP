@@ -271,7 +271,7 @@ Keep responses concise, helpful, and maintain the retro-cyber theme when appropr
                        "🧠 **Phi-4 Models**: Microsoft's efficient small language models\n" +
                        "🧠 **Privacy**: All processing happens on your device\n" +
                        "🧠 **Performance**: Optimized for local hardware\n\n" +
-                       "Current status: {CurrentModelName}\n" +
+                       $"Current status: {CurrentModelName}\n" +
                        "Want to know more about local AI capabilities?";
             }
 
