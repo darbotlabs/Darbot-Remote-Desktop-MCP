@@ -1,0 +1,196 @@
+﻿<Window x:Class="RetroRDPClient.WPF.ConnectionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🚀 New RDP Connection" 
+        Height="500" 
+        Width="450"
+        MinHeight="450"
+        MinWidth="400"
+        Style="{StaticResource CyberWindow}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        ShowInTaskbar="False">
+    
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1" Opacity="0.95">
+            <GradientStop Color="{StaticResource CyberBlack}" Offset="0"/>
+            <GradientStop Color="{StaticResource CyberDarkGray}" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="🖥️ ESTABLISH NEW CONNECTION" 
+                       Style="{StaticResource CyberTitle}"
+                       FontSize="18"
+                       HorizontalAlignment="Center"
+                       Effect="{StaticResource CyberNeonGlow}"/>
+            <TextBlock Text="Configure your remote desktop connection parameters" 
+                       Style="{StaticResource CyberText}"
+                       FontSize="11"
+                       HorizontalAlignment="Center"
+                       Margin="0,5,0,0"
+                       Opacity="0.8"/>
+        </StackPanel>
+
+        <!-- Connection Form -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <!-- Session Name -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="🏷️ Session Name:" 
+                               Style="{StaticResource CyberText}"
+                               FontSize="12"
+                               Margin="0,0,0,5"/>
+                    <TextBox x:Name="SessionNameTextBox"
+                             Style="{StaticResource CyberTextBox}"
+                             Text="New Session"
+                             ToolTip="Display name for this connection"/>
+                </StackPanel>
+
+                <!-- Server Address -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="🌐 Server Address:" 
+                               Style="{StaticResource CyberText}"
+                               FontSize="12"
+                               Margin="0,0,0,5"/>
+                    <TextBox x:Name="HostTextBox"
+                             Style="{StaticResource CyberTextBox}"
+                             Text="192.168.1.100"
+                             ToolTip="IP address or hostname of the remote computer"/>
+                </StackPanel>
+
+                <!-- Port -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="🔌 Port:" 
+                               Style="{StaticResource CyberText}"
+                               FontSize="12"
+                               Margin="0,0,0,5"/>
+                    <TextBox x:Name="PortTextBox"
+                             Style="{StaticResource CyberTextBox}"
+                             Text="3389"
+                             ToolTip="RDP port (default: 3389)"/>
+                </StackPanel>
+
+                <!-- Username -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="👤 Username:" 
+                               Style="{StaticResource CyberText}"
+                               FontSize="12"
+                               Margin="0,0,0,5"/>
+                    <TextBox x:Name="UsernameTextBox"
+                             Style="{StaticResource CyberTextBox}"
+                             Text="Administrator"
+                             ToolTip="Username for authentication"/>
+                </StackPanel>
+
+                <!-- Password -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="🔐 Password:" 
+                               Style="{StaticResource CyberText}"
+                               FontSize="12"
+                               Margin="0,0,0,5"/>
+                    <PasswordBox x:Name="PasswordBox"
+                                 Style="{StaticResource CyberPasswordBox}"
+                                 ToolTip="Password for authentication"/>
+                </StackPanel>
+
+                <!-- Advanced Settings Expander -->
+                <Expander Header="⚙️ Advanced Settings" 
+                          Style="{StaticResource CyberExpander}"
+                          Margin="0,10,0,0">
+                    <StackPanel Margin="10">
+                        <!-- Resolution -->
+                        <StackPanel Margin="0,0,0,15">
+                            <TextBlock Text="📺 Screen Resolution:" 
+                                       Style="{StaticResource CyberText}"
+                                       FontSize="11"
+                                       Margin="0,0,0,5"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="ScreenWidthTextBox"
+                                         Grid.Column="0"
+                                         Style="{StaticResource CyberTextBox}"
+                                         Text="1920"
+                                         ToolTip="Screen width in pixels"/>
+                                <TextBlock Grid.Column="1"
+                                           Text=" × "
+                                           Style="{StaticResource CyberText}"
+                                           VerticalAlignment="Center"
+                                           Margin="5"/>
+                                <TextBox x:Name="ScreenHeightTextBox"
+                                         Grid.Column="2"
+                                         Style="{StaticResource CyberTextBox}"
+                                         Text="1080"
+                                         ToolTip="Screen height in pixels"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Color Depth -->
+                        <StackPanel Margin="0,0,0,15">
+                            <TextBlock Text="🎨 Color Depth:" 
+                                       Style="{StaticResource CyberText}"
+                                       FontSize="11"
+                                       Margin="0,0,0,5"/>
+                            <ComboBox x:Name="ColorDepthComboBox"
+                                      Style="{StaticResource CyberComboBox}"
+                                      SelectedIndex="2">
+                                <ComboBoxItem>15 bit (High Color)</ComboBoxItem>
+                                <ComboBoxItem>16 bit (High Color)</ComboBoxItem>
+                                <ComboBoxItem>24 bit (True Color)</ComboBoxItem>
+                                <ComboBoxItem>32 bit (Highest Quality)</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Full Screen -->
+                        <CheckBox x:Name="FullScreenCheckBox"
+                                  Style="{StaticResource CyberCheckBox}"
+                                  Content="🖥️ Start in Full Screen Mode"
+                                  Margin="0,5"/>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Button Panel -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="CancelButton"
+                    Grid.Column="0"
+                    Style="{StaticResource CyberButton}"
+                    Content="❌ CANCEL"
+                    Padding="20,8"
+                    Click="CancelButton_Click"
+                    HorizontalAlignment="Left"
+                    MinWidth="100"/>
+
+            <Button x:Name="ConnectButton"
+                    Grid.Column="2"
+                    Style="{StaticResource CyberButton}"
+                    Content="⚡ CONNECT"
+                    Padding="20,8"
+                    Click="ConnectButton_Click"
+                    HorizontalAlignment="Right"
+                    MinWidth="100"
+                    IsDefault="True"/>
+        </Grid>
+    </Grid>
+</Window>
