@@ -388,3 +388,9 @@ appsettings.*.local.json
 *.pem
 *.p12
 connection.strings.*
+
+# Deployment and packaging artifacts
+dist/
+*.zip
+deployment-info.txt
+test-publish/
