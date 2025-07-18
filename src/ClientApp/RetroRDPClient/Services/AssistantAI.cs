@@ -279,7 +279,7 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             string endpoint = _isAzureOpenAI 
-                ? $"{_apiEndpoint}/openai/deployments/{_modelName}/chat/completions?api-version=2024-02-15-preview"
+                ? $"{_apiEndpoint}/openai/deployments/{_modelName}/chat/completions?api-version={_apiVersion}"
                 : _apiEndpoint!;
 
             var response = await _httpClient.PostAsync(endpoint, content, cancellationToken);
