@@ -33,6 +33,12 @@
     <PackageReference Include="System.Numerics.Tensors" Version="9.0.0" />
     <!-- For JSON handling - use latest version to avoid security vulnerabilities -->
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <!-- Logging infrastructure -->
+    <PackageReference Include="Serilog" Version="4.1.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
   </ItemGroup>
 
   <!-- Project references -->

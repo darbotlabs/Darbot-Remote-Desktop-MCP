@@ -69,6 +69,9 @@ namespace RetroRDPClient.Services
                 // Store session
                 _sessions[session.SessionId] = session;
 
+                // Log connection attempt (no sensitive data)
+                LoggingService.LogRdpConnectionAttempt(session.SessionId, session.Host, session.Port, session.Username);
+
                 // Store credentials securely
                 var securePassword = new SecureString();
                 foreach (char c in connectionRequest.Password)
@@ -205,6 +208,15 @@ namespace RetroRDPClient.Services
             if (status == RdpSessionStatus.Connected)
             {
                 session.ConnectedAt = DateTime.Now;
+                LoggingService.LogRdpConnectionSuccess(sessionId, session.Host);
+            }
+            else if (status == RdpSessionStatus.Disconnected)
+            {
+                LoggingService.LogRdpDisconnection(sessionId, session.Host, errorMessage ?? "User disconnected");
+            }
+            else if (status == RdpSessionStatus.Failed)
+            {
+                LoggingService.LogRdpConnectionFailure(sessionId, session.Host, errorMessage ?? "Unknown error");
             }
 
             session.LastActivity = DateTime.Now;

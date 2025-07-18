@@ -233,6 +233,12 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                     response.Success = true;
                     response.ConversationId = conversationContext.ConversationId;
                     
+                    // Log AI command execution
+                    LoggingService.LogAiCommandExecution(
+                        $"{response.Command.Action}: {userInput}", 
+                        response.Message ?? "Command processed", 
+                        response.Success);
+                    
                     // Add assistant response to conversation
                     conversationContext.Messages.Add(new ConversationMessage
                     {
@@ -253,6 +259,13 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 _logger?.LogWarning("Failed to parse AI response as JSON, using fallback");
                 var fallback = ParseCommandFallback(userInput);
                 fallback.ConversationId = conversationContext.ConversationId;
+                
+                // Log fallback command execution
+                LoggingService.LogAiCommandExecution(
+                    $"Fallback: {userInput}", 
+                    fallback.Message ?? "Fallback command processed", 
+                    fallback.Success);
+                
                 return fallback;
             }
             catch (Exception ex)
@@ -260,6 +273,13 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 _logger?.LogError(ex, "Error parsing command with AI");
                 var fallback = ParseCommandFallback(userInput);
                 fallback.ConversationId = conversationContext.ConversationId;
+                
+                // Log error and fallback
+                LoggingService.LogAiCommandExecution(
+                    $"Error fallback: {userInput}", 
+                    $"Error occurred: {ex.Message}", 
+                    false);
+                
                 return fallback;
             }
         }
