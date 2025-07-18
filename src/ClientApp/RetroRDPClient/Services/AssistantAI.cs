@@ -26,6 +26,7 @@ namespace RetroRDPClient.Services
         private string? _apiKey;
         private string? _apiEndpoint;
         private string? _modelName;
+        private string? _apiVersion;
         private bool _isAzureOpenAI;
 
         // Conversation management
@@ -110,6 +111,7 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 if (!string.IsNullOrEmpty(_apiKey) && !string.IsNullOrEmpty(_apiEndpoint))
                 {
                     _isAzureOpenAI = true;
+                    _apiVersion = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_VERSION") ?? "2024-08-01-preview";
                     ServiceName = $"Azure OpenAI ({_modelName})";
                     _logger?.LogInformation("Using Azure OpenAI service");
                 }
