@@ -9,6 +9,7 @@ using RetroRDP.Shared.Services;
 using RetroRDPClient.WPF;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RetroRDPClient
 {
@@ -20,6 +21,8 @@ namespace RetroRDPClient
     public partial class MainWindow : Window
     {
         private readonly ILocalAIService _aiService;
+        private readonly IAssistantAI _assistantAI;
+        private readonly IScreenshotService _screenshotService;
         private readonly ISessionManager _sessionManager;
         private readonly ILogger<MainWindow>? _logger;
         private readonly Dictionary<string, TabItem> _sessionTabs = new();
@@ -37,6 +40,16 @@ namespace RetroRDPClient
                 loggerFactory.CreateLogger<LocalAIService>() : 
                 null);
 
+            // Initialize Assistant AI Service
+            _assistantAI = new AssistantAI(_logger != null ?
+                loggerFactory.CreateLogger<AssistantAI>() :
+                null);
+
+            // Initialize Screenshot Service
+            _screenshotService = new ScreenshotService(_logger != null ?
+                loggerFactory.CreateLogger<ScreenshotService>() :
+                null);
+
             // Initialize Session Manager
             _sessionManager = new SessionManager(_logger != null ?
                 loggerFactory.CreateLogger<SessionManager>() :
@@ -52,8 +65,8 @@ namespace RetroRDPClient
             // Wire up navigation events
             NavigationList.SelectionChanged += NavigationList_SelectionChanged;
             
-            // Initialize AI service and add welcome messages
-            InitializeAIServiceAsync();
+            // Initialize AI services and add welcome messages
+            InitializeServicesAsync();
 
             // Set up session tabs
             InitializeSessionTabs();
@@ -519,30 +532,48 @@ namespace RetroRDPClient
 
         // ... (rest of the existing methods remain the same)
 
-        private async void InitializeAIServiceAsync()
+        private async void InitializeServicesAsync()
         {
             try
             {
-                var success = await _aiService.InitializeAsync();
-                if (success)
+                // Initialize Local AI Service (fallback)
+                var localAiSuccess = await _aiService.InitializeAsync();
+                
+                // Initialize Assistant AI Service (cloud AI)
+                var assistantSuccess = await _assistantAI.InitializeAsync();
+                
+                AddWelcomeMessages();
+                
+                if (assistantSuccess)
                 {
-                    AddWelcomeMessages();
-                    AddChatMessage($"🤖 AssistBot: Local AI service initialized successfully! Running: {_aiService.CurrentModelName}", isUser: false);
-                    _logger?.LogInformation("AI service initialized successfully");
+                    AddChatMessage($"🤖 AssistBot: Advanced AI assistant ready! Using: {_assistantAI.ServiceName}", isUser: false);
+                    AddChatMessage("🤖 AssistBot: I can now parse natural language commands like 'connect to server.com as admin' or 'take screenshot of session 1'. Try it out!", isUser: false);
+                }
+                else if (localAiSuccess)
+                {
+                    AddChatMessage($"🤖 AssistBot: Local AI service ready! Using: {_aiService.CurrentModelName}", isUser: false);
+                    AddChatMessage("🤖 AssistBot: I'm running in enhanced local mode and ready to help with your RDP needs.", isUser: false);
                 }
                 else
                 {
-                    AddWelcomeMessages();
-                    AddChatMessage("🤖 AssistBot: AI service initialization failed. Using basic fallback mode.", isUser: false);
-                    _logger?.LogWarning("AI service initialization failed");
+                    AddChatMessage("🤖 AssistBot: Welcome! I'm running in safe mode and ready to help with your RDP needs.", isUser: false);
                 }
+                
+                _logger?.LogInformation("AI services initialized - Assistant: {AssistantReady}, Local: {LocalReady}", 
+                    assistantSuccess, localAiSuccess);
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error initializing AI service");
+                _logger?.LogError(ex, "Error initializing AI services");
                 AddWelcomeMessages();
                 AddChatMessage("🤖 AssistBot: Welcome! I'm running in safe mode and ready to help with your RDP needs.", isUser: false);
             }
+        }
+
+        private async void InitializeAIServiceAsync()
+        {
+            // This method is replaced by InitializeServicesAsync()
+            // Keeping for backward compatibility but not used
         }
 
         private void AddWelcomeMessages()
@@ -614,6 +645,299 @@ namespace RetroRDPClient
 
         private async Task<string> ProcessCommandAsync(string command)
         {
+            var lowerCommand = command.ToLowerInvariant();
+
+            try
+            {
+                // Show "typing" indicator
+                AddChatMessage("🤖 AssistBot: *thinking...*", isUser: false);
+
+                // Use AssistantAI to parse the command
+                var assistantResponse = await _assistantAI.ParseCommandAsync(command);
+
+                // Remove the "thinking" indicator
+                RemoveLastChatMessage();
+
+                if (assistantResponse.Success && assistantResponse.Command != null)
+                {
+                    var cmd = assistantResponse.Command;
+                    
+                    // Execute the parsed command
+                    var result = await ExecuteAssistantCommandAsync(cmd);
+                    
+                    // Return appropriate response
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        return result;
+                    }
+                    else if (!string.IsNullOrEmpty(assistantResponse.Message))
+                    {
+                        return $"🤖 AssistBot: {assistantResponse.Message}";
+                    }
+                    else
+                    {
+                        return $"🤖 AssistBot: {cmd.Explanation ?? "Command processed successfully."}";
+                    }
+                }
+                else if (assistantResponse.NeedsMoreInfo)
+                {
+                    var response = $"🤖 AssistBot: {assistantResponse.Message}";
+                    if (assistantResponse.FollowUpQuestions != null && assistantResponse.FollowUpQuestions.Length > 0)
+                    {
+                        response += "\n\n" + string.Join("\n", assistantResponse.FollowUpQuestions.Select(q => $"• {q}"));
+                    }
+                    return response;
+                }
+                else
+                {
+                    // Fallback to general conversation
+                    return await _assistantAI.GenerateResponseAsync(command);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error processing command with AssistantAI");
+                
+                // Remove "thinking" indicator if it exists
+                RemoveLastChatMessage();
+                
+                // Fallback to basic command processing
+                return await ProcessCommandFallbackAsync(command);
+            }
+        }
+
+        private async Task<string> ExecuteAssistantCommandAsync(AssistantCommand command)
+        {
+            try
+            {
+                switch (command.Action)
+                {
+                    case AssistantActionType.Connect:
+                        return await HandleConnectCommandAsync(command);
+
+                    case AssistantActionType.Disconnect:
+                        return await HandleDisconnectCommandAsync(command);
+
+                    case AssistantActionType.DisconnectAll:
+                        var result = await _sessionManager.DisconnectAllSessionsAsync();
+                        return result 
+                            ? "🤖 AssistBot: ✅ All sessions disconnected successfully!"
+                            : "🤖 AssistBot: ⚠️ Some sessions could not be disconnected.";
+
+                    case AssistantActionType.ListSessions:
+                        return HandleListSessionsCommand();
+
+                    case AssistantActionType.Screenshot:
+                        return await HandleScreenshotCommandAsync(command);
+
+                    case AssistantActionType.GeneralHelp:
+                        return await _assistantAI.GenerateResponseAsync("help with RDP");
+
+                    default:
+                        return "🤖 AssistBot: I'm not sure how to handle that command. Can you try rephrasing it?";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error executing assistant command: {Action}", command.Action);
+                return $"🤖 AssistBot: ❌ Error executing command: {ex.Message}";
+            }
+        }
+
+        private async Task<string> HandleConnectCommandAsync(AssistantCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.Host))
+            {
+                return "🤖 AssistBot: I need a server address to connect to. Try: 'connect to server.example.com as username'";
+            }
+
+            if (string.IsNullOrWhiteSpace(command.Username))
+            {
+                // Open connection dialog with pre-filled host
+                Dispatcher.Invoke(() =>
+                {
+                    var dialog = new ConnectionDialog { Owner = this };
+                    // Pre-fill the host if we can access the dialog's properties
+                    dialog.ShowDialog();
+                });
+                return $"🤖 AssistBot: Opening connection dialog for {command.Host}. You'll need to provide credentials.";
+            }
+
+            if (string.IsNullOrWhiteSpace(command.Password))
+            {
+                return $"🤖 AssistBot: I found the server ({command.Host}) and user ({command.Username}), but I need a password to connect. For security, please use the connection dialog.";
+            }
+
+            // Create connection request and start session
+            var connectionRequest = new RdpConnectionRequest
+            {
+                Host = command.Host,
+                Username = command.Username,
+                Password = command.Password,
+                SessionName = command.SessionName ?? $"{command.Host} ({command.Username})",
+                Port = command.Port,
+                FullScreen = command.FullScreen,
+                ColorDepth = command.ColorDepth
+            };
+
+            var sessionId = await _sessionManager.StartSessionAsync(connectionRequest);
+            if (sessionId != null)
+            {
+                return $"🤖 AssistBot: ✅ Starting connection to {command.Host} as {command.Username}...";
+            }
+            else
+            {
+                return $"🤖 AssistBot: ❌ Failed to start connection to {command.Host}. Please check your parameters.";
+            }
+        }
+
+        private async Task<string> HandleDisconnectCommandAsync(AssistantCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.SessionId))
+            {
+                var sessions = _sessionManager.ActiveSessions;
+                if (sessions.Count == 0)
+                {
+                    return "🤖 AssistBot: No active sessions to disconnect.";
+                }
+                else if (sessions.Count == 1)
+                {
+                    // Disconnect the only session
+                    var success = await _sessionManager.EndSessionAsync(sessions[0].SessionId);
+                    return success 
+                        ? $"🤖 AssistBot: ✅ Disconnected session: {sessions[0].DisplayName}"
+                        : "🤖 AssistBot: ❌ Failed to disconnect the session.";
+                }
+                else
+                {
+                    // Multiple sessions, ask which one
+                    var sessionList = string.Join("\n", sessions.Select((s, i) => $"{i + 1}. {s.DisplayName} ({s.Host})"));
+                    return $"🤖 AssistBot: Which session would you like to disconnect?\n\n{sessionList}\n\nSay 'disconnect session 1' or use the session name.";
+                }
+            }
+
+            // Try to find session by ID or name/number
+            var session = FindSessionByIdOrName(command.SessionId);
+            if (session == null)
+            {
+                return $"🤖 AssistBot: ❌ Could not find session '{command.SessionId}'. Use 'list sessions' to see available sessions.";
+            }
+
+            var result = await _sessionManager.EndSessionAsync(session.SessionId);
+            return result 
+                ? $"🤖 AssistBot: ✅ Disconnected session: {session.DisplayName}"
+                : $"🤖 AssistBot: ❌ Failed to disconnect session: {session.DisplayName}";
+        }
+
+        private string HandleListSessionsCommand()
+        {
+            var sessions = _sessionManager.ActiveSessions;
+            if (sessions.Count == 0)
+            {
+                return "🤖 AssistBot: No active RDP sessions currently.";
+            }
+
+            var statusText = $"🤖 AssistBot: Active Sessions ({sessions.Count}):\n\n";
+            for (int i = 0; i < sessions.Count; i++)
+            {
+                var session = sessions[i];
+                statusText += $"{i + 1}. **{session.DisplayName}**\n";
+                statusText += $"   • Host: {session.Host}:{session.Port}\n";
+                statusText += $"   • User: {session.Username}\n";
+                statusText += $"   • Status: {session.StatusDisplay}\n";
+                statusText += $"   • Created: {session.CreatedAt:HH:mm:ss}\n\n";
+            }
+            return statusText.TrimEnd();
+        }
+
+        private async Task<string> HandleScreenshotCommandAsync(AssistantCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.SessionId))
+            {
+                var sessions = _sessionManager.ActiveSessions;
+                if (sessions.Count == 0)
+                {
+                    return "🤖 AssistBot: No active sessions to capture.";
+                }
+                else if (sessions.Count == 1)
+                {
+                    // Screenshot the only session
+                    var filePath = await _screenshotService.CaptureSessionScreenshotAsync(sessions[0].SessionId);
+                    return filePath != null 
+                        ? $"🤖 AssistBot: 📸 Screenshot captured for {sessions[0].DisplayName}\nSaved to: {filePath}"
+                        : "🤖 AssistBot: ❌ Failed to capture screenshot.";
+                }
+                else
+                {
+                    // Multiple sessions, ask which one
+                    var sessionList = string.Join("\n", sessions.Select((s, i) => $"{i + 1}. {s.DisplayName}"));
+                    return $"🤖 AssistBot: Which session would you like to capture?\n\n{sessionList}\n\nSay 'screenshot session 1' or use the session name.";
+                }
+            }
+
+            // Try to find session by ID or name/number
+            var session = FindSessionByIdOrName(command.SessionId);
+            if (session == null)
+            {
+                return $"🤖 AssistBot: ❌ Could not find session '{command.SessionId}'. Use 'list sessions' to see available sessions.";
+            }
+
+            var filePath = await _screenshotService.CaptureSessionScreenshotAsync(session.SessionId);
+            return filePath != null 
+                ? $"🤖 AssistBot: 📸 Screenshot captured for {session.DisplayName}\nSaved to: {filePath}"
+                : $"🤖 AssistBot: ❌ Failed to capture screenshot for {session.DisplayName}";
+        }
+
+        private RdpSession? FindSessionByIdOrName(string identifier)
+        {
+            var sessions = _sessionManager.ActiveSessions;
+
+            // Try exact session ID match first
+            var session = sessions.FirstOrDefault(s => s.SessionId == identifier);
+            if (session != null) return session;
+
+            // Try session name match
+            session = sessions.FirstOrDefault(s => s.SessionName.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+            if (session != null) return session;
+
+            // Try host match
+            session = sessions.FirstOrDefault(s => s.Host.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+            if (session != null) return session;
+
+            // Try numeric index (1-based)
+            if (int.TryParse(identifier, out var index) && index > 0 && index <= sessions.Count)
+            {
+                return sessions[index - 1];
+            }
+
+            return null;
+        }
+
+        private void RemoveLastChatMessage()
+        {
+            try
+            {
+                if (ChatPanel.Children.Count > 0)
+                {
+                    var lastChild = ChatPanel.Children[ChatPanel.Children.Count - 1];
+                    if (lastChild is Border border && border.Child is TextBlock textBlock)
+                    {
+                        if (textBlock.Text.Contains("*thinking...*"))
+                        {
+                            ChatPanel.Children.RemoveAt(ChatPanel.Children.Count - 1);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error removing last chat message");
+            }
+        }
+
+        private async Task<string> ProcessCommandFallbackAsync(string command)
+        {
+            // Fallback to original simple command processing
             var lowerCommand = command.ToLowerInvariant();
 
             // Handle specific RDP commands
@@ -731,6 +1055,7 @@ namespace RetroRDPClient
         {
             // Clean up AI service resources
             _aiService?.Dispose();
+            _assistantAI?.Dispose();
             // Clean up session manager resources
             _sessionManager?.Dispose();
             base.OnClosed(e);
