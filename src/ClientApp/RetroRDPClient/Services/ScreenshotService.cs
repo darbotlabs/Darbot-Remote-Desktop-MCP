@@ -31,6 +31,22 @@ namespace RetroRDPClient.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The file path where the screenshot was saved, or null if failed</returns>
         Task<string?> CaptureApplicationScreenshotAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Capture a screenshot with enhanced options
+        /// </summary>
+        /// <param name="sessionId">Session to capture (optional)</param>
+        /// <param name="mode">Screenshot mode: session, application, fullscreen</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>The file path where the screenshot was saved, or null if failed</returns>
+        Task<string?> CaptureEnhancedScreenshotAsync(string? sessionId = null, string mode = "session", CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Capture screenshots of all active sessions
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Array of file paths for captured screenshots</returns>
+        Task<string[]> CaptureAllSessionsAsync(CancellationToken cancellationToken = default);
     }
 
     /// <summary>
@@ -148,6 +164,122 @@ Screenshot info saved to: {filePath}
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to capture application screenshot");
+                return null;
+            }
+        }
+
+        public async Task<string?> CaptureEnhancedScreenshotAsync(string? sessionId = null, string mode = "session", CancellationToken cancellationToken = default)
+        {
+            _logger?.LogInformation("Capturing enhanced screenshot - Mode: {Mode}, Session: {SessionId}", mode, sessionId ?? "N/A");
+
+            return mode.ToLowerInvariant() switch
+            {
+                "fullscreen" => await CaptureFullScreenAsync(cancellationToken),
+                "application" => await CaptureApplicationScreenshotAsync(cancellationToken),
+                "session" => sessionId != null ? await CaptureSessionScreenshotAsync(sessionId, cancellationToken) : null,
+                _ => await CaptureApplicationScreenshotAsync(cancellationToken)
+            };
+        }
+
+        public async Task<string[]> CaptureAllSessionsAsync(CancellationToken cancellationToken = default)
+        {
+            _logger?.LogInformation("Capturing screenshots of all active sessions");
+
+            var results = new List<string>();
+
+            // Simulate capturing multiple sessions
+            // In a real implementation, this would iterate through active RDP sessions
+            var simulatedSessionIds = new[] { "session_1", "session_2", "session_3" };
+
+            foreach (var sessionId in simulatedSessionIds)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
+                var screenshot = await CaptureSessionScreenshotAsync(sessionId, cancellationToken);
+                if (screenshot != null)
+                {
+                    results.Add(screenshot);
+                }
+
+                // Brief delay between captures
+                await Task.Delay(200, cancellationToken);
+            }
+
+            _logger?.LogInformation("Captured {Count} session screenshots", results.Count);
+            return results.ToArray();
+        }
+
+        private async Task<string?> CaptureFullScreenAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger?.LogInformation("Capturing fullscreen screenshot");
+
+#if NET8_0_WINDOWS
+                return await Task.Run(() =>
+                {
+                    try
+                    {
+                        // Get primary screen dimensions
+                        var screenWidth = (int)SystemParameters.PrimaryScreenWidth;
+                        var screenHeight = (int)SystemParameters.PrimaryScreenHeight;
+
+                        // Create a visual brush to capture the screen
+                        var renderTargetBitmap = new RenderTargetBitmap(
+                            screenWidth, screenHeight, 96, 96, PixelFormats.Pbgra32);
+
+                        // For fullscreen capture, we'd typically use WinAPI or other screen capture methods
+                        // This is a simplified version that captures what's available to WPF
+                        var visual = Application.Current.MainWindow;
+                        if (visual != null)
+                        {
+                            renderTargetBitmap.Render(visual);
+                        }
+
+                        var fileName = $"RetroRDP_Fullscreen_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+                        var filePath = Path.Combine(_screenshotDirectory, fileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            var encoder = new PngBitmapEncoder();
+                            encoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+                            encoder.Save(fileStream);
+                        }
+
+                        _logger?.LogInformation("Fullscreen screenshot saved to {FilePath}", filePath);
+                        return filePath;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Error capturing fullscreen screenshot");
+                        return null;
+                    }
+                }, cancellationToken);
+#else
+                // Cross-platform fallback
+                var fileName = $"RetroRDP_Fullscreen_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                var filePath = Path.Combine(_screenshotDirectory, fileName);
+
+                var screenshotInfo = $@"RetroRDP Fullscreen Screenshot
+===============================
+Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
+Note: This is a placeholder for fullscreen screenshot.
+
+On Windows, this would capture the entire screen including all applications.
+Cross-platform fullscreen capture is not available in this build.
+
+Screenshot info saved to: {filePath}
+";
+
+                await File.WriteAllTextAsync(filePath, screenshotInfo, cancellationToken);
+                _logger?.LogInformation("Cross-platform fullscreen placeholder saved to {FilePath}", filePath);
+                return filePath;
+#endif
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Failed to capture fullscreen screenshot");
                 return null;
             }
         }

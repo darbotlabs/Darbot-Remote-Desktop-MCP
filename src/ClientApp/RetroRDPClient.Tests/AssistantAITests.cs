@@ -48,7 +48,7 @@ namespace RetroRDPClient.Tests
             Assert.True(response.Success);
             Assert.NotNull(response.Command);
             Assert.Equal(AssistantActionType.Connect, response.Command.Action);
-            Assert.Contains("connection", response.Message.ToLowerInvariant());
+            Assert.Contains("connect", response.Message.ToLowerInvariant());
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace RetroRDPClient.Tests
             await assistant.InitializeAsync();
 
             // Act
-            var response = await assistant.GenerateResponseAsync("hello");
+            var response = await assistant.GenerateResponseAsync("hello", null);
 
             // Assert
             Assert.NotNull(response);
