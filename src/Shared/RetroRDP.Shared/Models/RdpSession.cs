@@ -36,6 +36,11 @@ namespace RetroRDP.Shared.Models
         public int ColorDepth { get; set; } = 32;
         
         /// <summary>
+        /// Performance optimization options for this session
+        /// </summary>
+        public RdpPerformanceOptions PerformanceOptions { get; set; } = RdpPerformanceOptions.GetDefault();
+        
+        /// <summary>
         /// Gets a display name for the session tab
         /// </summary>
         public string DisplayName => !string.IsNullOrEmpty(SessionName) 

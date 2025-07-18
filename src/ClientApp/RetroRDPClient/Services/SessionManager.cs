@@ -21,6 +21,7 @@ namespace RetroRDPClient.Services
         private readonly ConcurrentDictionary<string, RdpSession> _sessions = new();
         private readonly ConcurrentDictionary<string, object> _rdpControls = new(); // Store RDP control references
         private readonly ConcurrentDictionary<string, SecureString> _sessionCredentials = new(); // Secure password storage
+        private readonly PerformanceMonitoringService _performanceMonitor;
         private bool _disposed = false;
 
         public event EventHandler<SessionStatusChangedEventArgs>? SessionStatusChanged;
@@ -30,7 +31,9 @@ namespace RetroRDPClient.Services
         public SessionManager(ILogger<SessionManager>? logger = null)
         {
             _logger = logger;
-            _logger?.LogInformation("SessionManager initialized");
+            _performanceMonitor = new PerformanceMonitoringService(LoggingService.GetLogger<PerformanceMonitoringService>());
+            _performanceMonitor.PerformanceWarning += OnPerformanceWarning;
+            _logger?.LogInformation("SessionManager initialized with performance monitoring");
         }
 
         public RdpSession? GetSession(string sessionId)
@@ -68,6 +71,9 @@ namespace RetroRDPClient.Services
 
                 // Store session
                 _sessions[session.SessionId] = session;
+
+                // Register session with performance monitor
+                _performanceMonitor.RegisterSession(session.SessionId, session.Host);
 
                 // Log connection attempt (no sensitive data)
                 LoggingService.LogRdpConnectionAttempt(session.SessionId, session.Host, session.Port, session.Username);
@@ -131,6 +137,9 @@ namespace RetroRDPClient.Services
 
                 // Remove session
                 _sessions.TryRemove(sessionId, out _);
+
+                // Unregister from performance monitoring
+                _performanceMonitor.UnregisterSession(sessionId);
 
                 // Update status
                 UpdateSessionStatus(sessionId, RdpSessionStatus.Disconnected);
@@ -295,6 +304,17 @@ namespace RetroRDPClient.Services
         private void ConfigureRdpControl(object rdpControl, RdpSession session)
         {
             // RDP control configuration will be implemented here
+            // Apply performance options from session.PerformanceOptions
+            // For now, this is a placeholder that would configure:
+            // - Bitmap caching: session.PerformanceOptions.EnableBitmapCaching
+            // - Color depth: session.PerformanceOptions.ColorDepth
+            // - Screen resolution: session.PerformanceOptions.ScreenWidth/ScreenHeight
+            // - Compression: session.PerformanceOptions.EnableCompression
+            // - Audio quality: session.PerformanceOptions.AudioQuality
+            // - Visual effects: session.PerformanceOptions.EnableVisualEffects
+            
+            _logger?.LogDebug("Configuring RDP control for session {SessionId} with preset {Preset}", 
+                session.SessionId, session.PerformanceOptions.Preset);
         }
 
         private void ConnectRdpControl(object rdpControl, RdpSession session)
@@ -316,6 +336,35 @@ namespace RetroRDPClient.Services
             {
                 _logger?.LogWarning(ex, "Error disposing RDP control");
             }
+        }
+
+        private void OnPerformanceWarning(object? sender, PerformanceWarningEventArgs e)
+        {
+            _logger?.LogWarning("Performance warning: {WarningType} - {Message}", e.WarningType, e.Message);
+            
+            // Could trigger UI notifications or automatic optimizations here
+            if (e.Severity == PerformanceSeverity.Critical)
+            {
+                LoggingService.GetSerilogLogger().Warning("Critical performance issue detected: {Message}", e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get performance recommendations for the current system state
+        /// </summary>
+        public PerformanceRecommendations GetPerformanceRecommendations()
+        {
+            // Use the first session's performance options as a reference, or default
+            var referenceOptions = _sessions.Values.FirstOrDefault()?.PerformanceOptions ?? RdpPerformanceOptions.GetDefault();
+            return _performanceMonitor.GetOptimizationRecommendations(referenceOptions);
+        }
+
+        /// <summary>
+        /// Get current system performance metrics
+        /// </summary>
+        public SystemPerformanceMetrics GetSystemPerformanceMetrics()
+        {
+            return _performanceMonitor.GetSystemMetrics();
         }
 
         public void Dispose()
@@ -342,6 +391,10 @@ namespace RetroRDPClient.Services
                 _rdpControls.Clear();
 
                 _sessions.Clear();
+                
+                // Dispose performance monitor
+                _performanceMonitor?.Dispose();
+                
                 _disposed = true;
             }
         }
