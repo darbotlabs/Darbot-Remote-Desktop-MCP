@@ -101,3 +101,86 @@ AI Assistant <-- MCP Protocol --> MCP Server <-- HTTP --> RetroRDP Client
 - No sensitive credentials stored in logs
 - HTTP-only communication for localhost
 - Session isolation and management
+
+## 🤖 Microsoft Copilot Studio Integration
+
+### Quick Start for AI Agents
+
+**Complete Integration Guide**: See [Copilot Studio MCP Integration Guide](../../../docs/Copilot-Studio-MCP-Integration-Guide.md)
+
+### Essential Endpoints for Copilot Studio
+
+1. **Health Check**: `GET /mcp/health`
+2. **Capabilities**: `GET /mcp/capabilities` 
+3. **MCP Protocol**: `POST /mcp` (JSON-RPC 2.0)
+
+### Sample MCP Tool Calls for AI Agents
+
+#### Connect to RDP Server
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "method": "tools/call",
+  "params": {
+    "name": "connect_rdp",
+    "arguments": {
+      "host": "server.company.com",
+      "username": "admin",
+      "codec": "H265",
+      "maxBitrate": 8000,
+      "preset": "Quality",
+      "width": 1920,
+      "height": 1080
+    }
+  }
+}
+```
+
+#### List Active Sessions
+```json
+{
+  "jsonrpc": "2.0", 
+  "id": "2",
+  "method": "tools/call",
+  "params": {
+    "name": "list_rdp_sessions",
+    "arguments": {"includeMetrics": true}
+  }
+}
+```
+
+#### Configure Session Performance
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "3", 
+  "method": "tools/call",
+  "params": {
+    "name": "configure_rdp_session",
+    "arguments": {
+      "sessionId": "session-123",
+      "codec": "H264",
+      "maxBitrate": 4000,
+      "preset": "Performance"
+    }
+  }
+}
+```
+
+### Validation
+
+Run the comprehensive validation script:
+```bash
+./scripts/validate-mcp-server.sh
+```
+
+✅ **Full standalone MCP connector capabilities validated**:
+- Model Context Protocol 2024-11-05 compliance
+- H.264/H.265 codec support with configurable bitrate/resolution
+- 3 comprehensive MCP tools with advanced codec configuration
+- HTTP-based local connector for RetroRDP client communication
+- Production-ready logging and error handling
+- RESTful health check and capabilities endpoints
+
+🚀 **Ready for integration with Microsoft Copilot Studio!**
