@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using RetroRDPClient.Services;
 
 namespace RetroRDPClient
 {
@@ -11,6 +12,10 @@ namespace RetroRDPClient
         [STAThread]
         static void Main(string[] args)
         {
+            // Initialize logging service first
+            LoggingService.Initialize();
+            LoggingService.LogApplicationStartup();
+
             // On Windows, attempt to start the WPF application if available
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -26,6 +31,9 @@ namespace RetroRDPClient
                         
                         initMethod?.Invoke(app, null);
                         runMethod?.Invoke(app, null);
+                        
+                        LoggingService.LogApplicationShutdown();
+                        LoggingService.Shutdown();
                         return;
                     }
                     else
@@ -35,6 +43,7 @@ namespace RetroRDPClient
                 }
                 catch (Exception ex)
                 {
+                    LoggingService.GetSerilogLogger().Error(ex, "Failed to start WPF application");
                     Console.WriteLine($"Failed to start WPF application: {ex.Message}");
                     Console.WriteLine("Falling back to console mode...");
                 }
@@ -42,6 +51,9 @@ namespace RetroRDPClient
 
             // Console mode for non-Windows platforms or testing
             ShowConsoleVersion();
+            
+            LoggingService.LogApplicationShutdown();
+            LoggingService.Shutdown();
         }
 
         static void ShowConsoleVersion()

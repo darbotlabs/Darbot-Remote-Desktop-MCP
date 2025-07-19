@@ -1,0 +1,217 @@
+name: Release Build and Deploy
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.0.0
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number for manual release'
+        required: true
+        default: '1.0.0'
+
+env:
+  APP_NAME: RetroRDPClient
+  DOTNET_VERSION: '8.0.x'
+  
+jobs:
+  build-and-release:
+    name: Build and Create Release
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/*.trx'
+        
+    - name: Determine version
+      id: version
+      shell: pwsh
+      run: |
+        if ("${{ github.event_name }}" -eq "push") {
+          $version = "${{ github.ref }}" -replace 'refs/tags/v', ''
+        } else {
+          $version = "${{ github.event.inputs.version }}"
+        }
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+        
+    - name: Publish Self-Contained Windows
+      run: |
+        dotnet publish src/ClientApp/RetroRDPClient `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          --output "dist/self-contained" `
+          -p:PublishSingleFile=true `
+          -p:PublishReadyToRun=true `
+          -p:IncludeNativeLibrariesForSelfExtract=true `
+          -p:EnableCompressionInSingleFile=true `
+          -p:DebugType=embedded `
+          -p:PublishTrimmed=false
+          
+    - name: Publish Framework-Dependent Windows
+      run: |
+        dotnet publish src/ClientApp/RetroRDPClient `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained false `
+          --output "dist/framework-dependent" `
+          -p:PublishReadyToRun=true
+          
+    - name: Create deployment info
+      shell: pwsh
+      run: |
+        $version = "${{ steps.version.outputs.version }}"
+        $deploymentInfo = @"
+        RetroRDP Client Deployment Package
+        ==================================
+
+        Version: $version
+        Build Date: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC")
+        .NET Version: 8.0
+        Target Platform: Windows x64
+        Build Number: ${{ github.run_number }}
+        Commit SHA: ${{ github.sha }}
+
+        Contents:
+        - self-contained/: Complete application with .NET runtime included
+        - framework-dependent/: Smaller application requiring .NET 8 runtime  
+        - README.md: Application documentation
+        - LICENSE: License information
+
+        Installation Instructions:
+        - Self-contained: Extract and run RetroRDPClient.exe directly
+        - Framework-dependent: Install .NET 8 runtime first, then run RetroRDPClient.exe
+
+        For support and updates, visit: https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP
+        "@
+        
+        $deploymentInfo | Out-File -FilePath "dist/deployment-info.txt" -Encoding UTF8
+        
+    - name: Copy documentation
+      run: |
+        Copy-Item README.md dist/ -ErrorAction SilentlyContinue
+        Copy-Item LICENSE dist/ -ErrorAction SilentlyContinue
+        
+    - name: Create ZIP packages
+      shell: pwsh
+      run: |
+        $version = "${{ steps.version.outputs.version }}"
+        
+        # Create self-contained package
+        Compress-Archive -Path "dist/self-contained/*", "dist/deployment-info.txt", "dist/README.md", "dist/LICENSE" `
+          -DestinationPath "dist/${{ env.APP_NAME }}-$version-SelfContained-win-x64.zip" `
+          -CompressionLevel Optimal -Force
+          
+        # Create framework-dependent package  
+        Compress-Archive -Path "dist/framework-dependent/*", "dist/deployment-info.txt", "dist/README.md", "dist/LICENSE" `
+          -DestinationPath "dist/${{ env.APP_NAME }}-$version-FrameworkDependent-win-x64.zip" `
+          -CompressionLevel Optimal -Force
+          
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-packages
+        path: |
+          dist/*.zip
+          dist/deployment-info.txt
+          
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name || format('v{0}', steps.version.outputs.version) }}
+        release_name: RetroRDP Client v${{ steps.version.outputs.version }}
+        body: |
+          ## RetroRDP Client v${{ steps.version.outputs.version }}
+          
+          ### 🎮 Retro-Futuristic Remote Desktop Client
+          
+          A modern, production-ready multi-session Remote Desktop client featuring:
+          - **Retro-cyber aesthetic** with dark theme and neon glow effects
+          - **AI-powered assistant** with Microsoft Phi-4 integration
+          - **Multi-session management** with tabbed interface
+          - **Performance optimization** with configurable presets
+          - **Comprehensive logging** for debugging and monitoring
+          - **Professional packaging** for easy deployment
+          
+          ### 📦 Downloads
+          
+          **Self-Contained (Recommended)**
+          - Includes .NET runtime - runs on any Windows machine
+          - Single executable with all dependencies
+          - File: `${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-SelfContained-win-x64.zip`
+          
+          **Framework-Dependent**
+          - Requires .NET 8 runtime to be installed separately
+          - Smaller download size
+          - File: `${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-FrameworkDependent-win-x64.zip`
+          
+          ### 🚀 Installation
+          
+          1. Download the appropriate package above
+          2. Extract the ZIP file to your desired location
+          3. Run `RetroRDPClient.exe`
+          4. Enjoy your retro-cyber RDP experience!
+          
+          ### 🔧 System Requirements
+          
+          - Windows 10/11 (x64)
+          - .NET 8 runtime (for framework-dependent version)
+          - 2GB RAM minimum, 4GB recommended
+          - DirectX compatible graphics
+          
+          ### 📊 Build Information
+          
+          - Build Date: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss UTC")
+          - Build Number: ${{ github.run_number }}
+          - Commit SHA: ${{ github.sha }}
+          - Tests Passed: ✅
+          
+          For support and documentation, visit the [GitHub repository](https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP).
+        draft: false
+        prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+        
+    - name: Upload Self-Contained Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-SelfContained-win-x64.zip
+        asset_name: ${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-SelfContained-win-x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload Framework-Dependent Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-FrameworkDependent-win-x64.zip
+        asset_name: ${{ env.APP_NAME }}-${{ steps.version.outputs.version }}-FrameworkDependent-win-x64.zip
+        asset_content_type: application/zip

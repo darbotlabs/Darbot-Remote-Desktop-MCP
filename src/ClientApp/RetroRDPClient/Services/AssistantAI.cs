@@ -26,6 +26,7 @@ namespace RetroRDPClient.Services
         private string? _apiKey;
         private string? _apiEndpoint;
         private string? _modelName;
+        private string? _apiVersion;
         private bool _isAzureOpenAI;
 
         // Conversation management
@@ -110,6 +111,7 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 if (!string.IsNullOrEmpty(_apiKey) && !string.IsNullOrEmpty(_apiEndpoint))
                 {
                     _isAzureOpenAI = true;
+                    _apiVersion = Environment.GetEnvironmentVariable("AZURE_OPENAI_API_VERSION") ?? "2024-08-01-preview";
                     ServiceName = $"Azure OpenAI ({_modelName})";
                     _logger?.LogInformation("Using Azure OpenAI service");
                 }
@@ -231,6 +233,12 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                     response.Success = true;
                     response.ConversationId = conversationContext.ConversationId;
                     
+                    // Log AI command execution
+                    LoggingService.LogAiCommandExecution(
+                        $"{response.Command.Action}: {userInput}", 
+                        response.Message ?? "Command processed", 
+                        response.Success);
+                    
                     // Add assistant response to conversation
                     conversationContext.Messages.Add(new ConversationMessage
                     {
@@ -251,6 +259,13 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 _logger?.LogWarning("Failed to parse AI response as JSON, using fallback");
                 var fallback = ParseCommandFallback(userInput);
                 fallback.ConversationId = conversationContext.ConversationId;
+                
+                // Log fallback command execution
+                LoggingService.LogAiCommandExecution(
+                    $"Fallback: {userInput}", 
+                    fallback.Message ?? "Fallback command processed", 
+                    fallback.Success);
+                
                 return fallback;
             }
             catch (Exception ex)
@@ -258,6 +273,13 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 _logger?.LogError(ex, "Error parsing command with AI");
                 var fallback = ParseCommandFallback(userInput);
                 fallback.ConversationId = conversationContext.ConversationId;
+                
+                // Log error and fallback
+                LoggingService.LogAiCommandExecution(
+                    $"Error fallback: {userInput}", 
+                    $"Error occurred: {ex.Message}", 
+                    false);
+                
                 return fallback;
             }
         }
@@ -297,11 +319,22 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
 
         private AssistantResponse ParseCommandFallback(string userInput)
         {
+            // Handle null or empty input gracefully
+            if (string.IsNullOrEmpty(userInput))
+            {
+                var helpCommand = new AssistantCommand
+                {
+                    Action = AssistantActionType.GeneralHelp,
+                    Explanation = "No input provided"
+                };
+                return new AssistantResponse { Command = helpCommand, Success = true, Message = "Hello! How can I help you with your RDP connections today?" };
+            }
+
             var lowerInput = userInput.ToLowerInvariant();
             var command = new AssistantCommand();
 
             // Enhanced pattern matching for advanced commands
-            if (lowerInput.Contains("save") && (lowerInput.Contains("profile") || lowerInput.Contains("connection")))
+            if ((lowerInput.Contains("save") || lowerInput.Contains("create")) && (lowerInput.Contains("profile") || lowerInput.Contains("connection")))
             {
                 command.Action = AssistantActionType.CreateProfile;
                 command.Explanation = "Creating connection profile";
@@ -314,7 +347,9 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 return new AssistantResponse { Command = command, Success = true, Message = "Which profile would you like to load?" };
             }
             else if ((lowerInput.Contains("and") || lowerInput.Contains("then")) && 
-                    (lowerInput.Contains("connect") || lowerInput.Contains("screenshot") || lowerInput.Contains("disconnect")))
+                    (lowerInput.Contains("connect") || lowerInput.Contains("rdp") || lowerInput.Contains("remote") || 
+                     lowerInput.Contains("screenshot") || lowerInput.Contains("capture") || 
+                     lowerInput.Contains("disconnect") || lowerInput.Contains("close") || lowerInput.Contains("end")))
             {
                 command.Action = AssistantActionType.ChainedCommands;
                 command.Explanation = "Detected multiple commands to execute in sequence";
@@ -326,7 +361,7 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                 command.Explanation = "Disconnecting all active sessions";
                 return new AssistantResponse { Command = command, Success = true, Message = "Disconnecting all sessions..." };
             }
-            else if (lowerInput.Contains("disconnect") || lowerInput.Contains("close"))
+            else if (lowerInput.Contains("disconnect") || lowerInput.Contains("close") || lowerInput.Contains("end"))
             {
                 command.Action = AssistantActionType.Disconnect;
                 command.Explanation = "Disconnect request detected";
@@ -365,7 +400,8 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                     NeedsMoreInfo = string.IsNullOrEmpty(ExtractSessionReference(lowerInput))
                 };
             }
-            else if (lowerInput.Contains("connect") || lowerInput.Contains("rdp"))
+            else if (lowerInput.Contains("connect") || lowerInput.Contains("rdp") || 
+                    (lowerInput.Contains("remote") && (lowerInput.Contains("to ") || lowerInput.Contains("into") || lowerInput.Contains("session"))))
             {
                 command.Action = AssistantActionType.Connect;
                 command.Explanation = "Detected connection request";
