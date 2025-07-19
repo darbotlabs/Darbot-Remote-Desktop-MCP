@@ -85,6 +85,35 @@ namespace RetroRDP.Shared.Models
         public PerformancePreset Preset { get; set; } = PerformancePreset.Balanced;
 
         /// <summary>
+        /// Maximum bitrate for video streaming (kbps)
+        /// Higher values provide better quality but require more bandwidth
+        /// Range: 256 - 50000 kbps
+        /// </summary>
+        public int MaxBitrate { get; set; } = 4000; // 4 Mbps
+
+        /// <summary>
+        /// Minimum bitrate for video streaming (kbps)
+        /// Ensures minimum quality level
+        /// Range: 128 - 2000 kbps
+        /// </summary>
+        public int MinBitrate { get; set; } = 512; // 512 kbps
+
+        /// <summary>
+        /// Video codec for streaming
+        /// </summary>
+        public VideoCodec VideoCodec { get; set; } = VideoCodec.H264;
+
+        /// <summary>
+        /// Enable adaptive bitrate based on network conditions
+        /// </summary>
+        public bool EnableAdaptiveBitrate { get; set; } = true;
+
+        /// <summary>
+        /// Network latency optimization mode
+        /// </summary>
+        public NetworkOptimization NetworkMode { get; set; } = NetworkOptimization.Adaptive;
+
+        /// <summary>
         /// Apply a performance preset
         /// </summary>
         public void ApplyPreset(PerformancePreset preset)
@@ -104,6 +133,11 @@ namespace RetroRDP.Shared.Models
                     EnableCompression = true;
                     EnableBitmapCaching = true;
                     EnablePersistentBitmapCaching = true;
+                    MaxBitrate = 2000; // Lower bitrate for performance
+                    MinBitrate = 256;
+                    VideoCodec = VideoCodec.H264; // H.264 for compatibility
+                    EnableAdaptiveBitrate = true;
+                    NetworkMode = NetworkOptimization.LowLatency;
                     break;
 
                 case PerformancePreset.Quality:
@@ -117,6 +151,11 @@ namespace RetroRDP.Shared.Models
                     EnableCompression = false;
                     EnableBitmapCaching = true;
                     EnablePersistentBitmapCaching = true;
+                    MaxBitrate = 15000; // Higher bitrate for quality
+                    MinBitrate = 1000;
+                    VideoCodec = VideoCodec.H265; // H.265 for better quality
+                    EnableAdaptiveBitrate = false; // Fixed high quality
+                    NetworkMode = NetworkOptimization.HighBandwidth;
                     break;
 
                 case PerformancePreset.Balanced:
@@ -131,6 +170,11 @@ namespace RetroRDP.Shared.Models
                     EnableCompression = true;
                     EnableBitmapCaching = true;
                     EnablePersistentBitmapCaching = true;
+                    MaxBitrate = 4000; // Balanced bitrate
+                    MinBitrate = 512;
+                    VideoCodec = VideoCodec.H264; // H.264 for good compatibility
+                    EnableAdaptiveBitrate = true;
+                    NetworkMode = NetworkOptimization.Adaptive;
                     break;
             }
         }
@@ -166,7 +210,12 @@ namespace RetroRDP.Shared.Models
                 MaxConcurrentSessions = MaxConcurrentSessions,
                 CpuWarningThreshold = CpuWarningThreshold,
                 MemoryWarningThreshold = MemoryWarningThreshold,
-                Preset = Preset
+                Preset = Preset,
+                MaxBitrate = MaxBitrate,
+                MinBitrate = MinBitrate,
+                VideoCodec = VideoCodec,
+                EnableAdaptiveBitrate = EnableAdaptiveBitrate,
+                NetworkMode = NetworkMode
             };
         }
     }
@@ -190,5 +239,57 @@ namespace RetroRDP.Shared.Models
         /// Optimize for maximum quality over performance
         /// </summary>
         Quality
+    }
+
+    /// <summary>
+    /// Video codec options for RDP streaming
+    /// </summary>
+    public enum VideoCodec
+    {
+        /// <summary>
+        /// H.264/AVC codec - Good balance of quality and compatibility
+        /// </summary>
+        H264,
+
+        /// <summary>
+        /// H.265/HEVC codec - Better compression but requires more CPU
+        /// </summary>
+        H265,
+
+        /// <summary>
+        /// Legacy uncompressed mode - Maximum compatibility, highest bandwidth
+        /// </summary>
+        Uncompressed,
+
+        /// <summary>
+        /// Automatic selection based on client capabilities
+        /// </summary>
+        Auto
+    }
+
+    /// <summary>
+    /// Network optimization strategies
+    /// </summary>
+    public enum NetworkOptimization
+    {
+        /// <summary>
+        /// Optimize for low latency connections (gaming, real-time)
+        /// </summary>
+        LowLatency,
+
+        /// <summary>
+        /// Adaptive optimization based on network conditions
+        /// </summary>
+        Adaptive,
+
+        /// <summary>
+        /// Optimize for high bandwidth, stable connections
+        /// </summary>
+        HighBandwidth,
+
+        /// <summary>
+        /// Optimize for low bandwidth, unstable connections
+        /// </summary>
+        LowBandwidth
     }
 }
