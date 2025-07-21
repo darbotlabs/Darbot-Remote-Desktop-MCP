@@ -19,44 +19,64 @@ This application serves as a modern successor to Microsoft's retired Remote Desk
 
 ## Getting Started
 
-### Prerequisites
+### 🚀 Quick Setup (5 Minutes)
 
-- .NET 8.0 SDK or later
-- Windows 10/11
-- Visual Studio 2022 (recommended) or Visual Studio Code
+**New to RetroRDP?** Use our automated setup wizard:
 
-### Setup Instructions
+**Windows:**
+```cmd
+git clone https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP.git
+cd Darbot-Remote-Desktop-MCP
+scripts\setup-wizard.bat
+```
 
-1. Clone the repository:
+**Linux/macOS:**
+```bash
+git clone https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP.git
+cd Darbot-Remote-Desktop-MCP
+scripts/setup-wizard.sh
+```
+
+The wizard will guide you through:
+- ✅ System compatibility check
+- ✅ Automated build and configuration  
+- ✅ Performance optimization for your hardware
+- ✅ AI assistant setup
+- ✅ MCP server integration (optional)
+- ✅ Installation validation and testing
+
+### Manual Setup
+
+For experienced users who prefer manual setup:
+
+1. **Prerequisites Check**: Run the health check first
+   ```bash
+   scripts/health-check.sh
+   ```
+
+2. **Clone and Build**:
    ```bash
    git clone https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP.git
    cd Darbot-Remote-Desktop-MCP
-   ```
-
-2. Restore dependencies:
-   ```bash
    dotnet restore
+   dotnet build --configuration Release
    ```
 
-3. Build the solution:
-   ```bash
-   dotnet build
-   ```
-
-4. Run the client application:
+3. **Run the Client**:
    ```bash
    dotnet run --project src/ClientApp/RetroRDPClient
    ```
 
-5. *(Optional)* Set up local AI with Phi-4 models:
-   - Download Phi-4 ONNX models from Microsoft or Hugging Face
-   - Place models in `src/ClientApp/RetroRDPClient/Models/` directory
-   - See [Windows Foundry Local Setup Guide](docs/Windows-Foundry-Local-Setup.md) for detailed instructions
-
-6. Run the web API (optional):
+4. **Optional: Start MCP Server** (for AI integration):
    ```bash
-   dotnet run --project src/WebApp/RetroRDPWeb
+   dotnet run --project src/MCPServer/RetroRDP.MCPServer
    ```
+
+### 📚 Complete Documentation
+
+- **[Setup Guide](docs/Setup-Guide.md)**: Comprehensive setup instructions
+- **[User Guide](UserGuide.md)**: Complete feature documentation  
+- **[AI Integration Guide](docs/Copilot-Studio-MCP-Integration-Guide.md)**: Microsoft Copilot Studio setup
 
 ## Development Status
 

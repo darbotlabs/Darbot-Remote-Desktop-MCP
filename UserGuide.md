@@ -271,78 +271,185 @@ The system automatically suggests optimizations:
 
 ## 🔧 Troubleshooting
 
-### Common Connection Issues
+### Installation and Setup Issues
 
-**"Connection Failed" or "Unable to Connect"**
+#### ❌ "Application won't start"
+**Symptoms**: RetroRDP doesn't launch or crashes immediately
+**Possible Causes**:
+- Missing .NET runtime
+- Antivirus blocking the application
+- Insufficient permissions
+- Corrupted installation
 
-**Possible Causes & Solutions:**
+**Solutions**:
+1. **Run Health Check**: `scripts/health-check.sh` to diagnose issues
+2. **Check Dependencies**: Ensure .NET 8+ is installed
+3. **Antivirus Exclusion**: Add RetroRDP folder to antivirus exclusions
+4. **Run as Administrator**: Right-click → "Run as administrator" (once)
+5. **Clean Reinstall**: Delete and re-extract/rebuild the application
 
-1. **Network Connectivity**
-   - Check if you can ping the target machine
-   - Verify you're on the same network or VPN
-   - Test with command: `ping [hostname/ip]`
+#### ❌ "Build Failed" or Package Errors
+**Symptoms**: `dotnet build` fails with package or compilation errors
+**Solutions**:
+1. **Clean and Rebuild**:
+   ```bash
+   dotnet clean
+   dotnet restore --force-evaluate
+   dotnet build --configuration Release
+   ```
+2. **Update .NET**: Install the latest .NET 8 SDK
+3. **Clear Package Cache**: `dotnet nuget locals all --clear`
+4. **Check Internet**: Package restore requires internet connectivity
 
-2. **RDP Service Not Running**
-   - Ensure Remote Desktop is enabled on target machine
-   - Check Windows Services for "Remote Desktop Services"
-   - Verify the service is running and set to automatic
+#### ⚠️ Package Version Warnings
+**Symptoms**: Build warnings about TikToken or other package versions
+**Solution**: These are informational warnings and don't affect functionality. The application uses the best available compatible version.
 
-3. **Firewall Blocking Connection**
-   - Check Windows Firewall on target machine
-   - Ensure RDP (port 3389) is allowed through firewall
-   - Corporate firewalls might block RDP traffic
+### Connection Issues
 
-4. **Incorrect Credentials**
-   - Verify username and password are correct
-   - Try logging in locally to the target machine first
-   - Check if account is locked or disabled
+#### ❌ "Connection Failed" or "Unable to Connect"
+**Symptoms**: Can't connect to RDP server, timeout errors
+**Diagnosis Steps**:
+1. **Network Test**: `ping [your-server-ip]` 
+2. **Port Test**: `telnet [server-ip] 3389`
+3. **RDP Service Check**: Ensure Remote Desktop is enabled on target
 
-5. **Port Issues**
-   - Default RDP port is 3389
-   - Some systems use custom ports for security
-   - Ask your system administrator for the correct port
+**Solutions**:
+- **Enable RDP**: On target machine → Settings → System → Remote Desktop → Enable
+- **Firewall**: Allow "Remote Desktop" through Windows Firewall
+- **Network**: Verify same network/VPN connectivity
+- **Credentials**: Double-check username/password
+- **Port**: Confirm RDP port (default 3389, may be custom)
 
-**Performance Issues**
+#### ❌ "The connection was denied because the user account is not authorized for remote login"
+**Solution**: Add user to "Remote Desktop Users" group on target machine:
+1. Run `lusrmgr.msc` on target machine
+2. Groups → Remote Desktop Users → Add Members
+3. Add your user account
 
-**Slow Response or Lag:**
-- Switch to Performance preset
-- Reduce screen resolution
-- Close other applications
-- Check network bandwidth
+#### ❌ "Your credentials did not work"
+**Common Issues**:
+- Wrong username format (try `domain\username` or `username@domain`)
+- Password recently changed
+- Account locked or disabled
 
-**High CPU Usage:**
-- Limit concurrent sessions
-- Use lower color depth
-- Disable visual effects
-- Monitor other running applications
+**Solutions**:
+- Test login locally on target machine first
+- Try different username formats
+- Reset password if necessary
 
-**Connection Drops Frequently:**
-- Check network stability
-- Increase connection timeout settings
-- Consider using VPN if connecting over internet
-- Update RDP client and target machine
+### Performance Issues
 
-### Error Messages
+#### 🐌 Slow Performance or Lag
+**Symptoms**: RDP session responds slowly, choppy video
+**Solutions**:
+1. **Switch Presets**: Use "Performance" instead of "Quality"
+2. **Reduce Resolution**: Lower to 1024x768 or 1280x720
+3. **Limit Sessions**: Close unused RDP sessions  
+4. **Network Check**: Test network speed to server
+5. **Resource Monitor**: Check CPU/RAM usage
 
-**"The connection was denied because the user account is not authorized for remote login"**
-- User needs "Log on through Remote Desktop Services" permission
-- Add user to "Remote Desktop Users" group on target machine
+#### 🖥️ High CPU Usage
+**Symptoms**: Fan noise, system slow, high CPU in Task Manager
+**Solutions**:
+- **Performance Preset**: Switch to "Performance" mode
+- **Reduce Color Depth**: Use 16-bit instead of 32-bit
+- **Session Limit**: Keep to 2-3 concurrent sessions max
+- **Close Other Apps**: Free up CPU for RDP sessions
 
-**"The remote computer requires Network Level Authentication"**
-- Enable NLA in connection settings, or
-- Disable NLA on the target machine (less secure)
+#### 💾 High Memory Usage
+**Symptoms**: System slow, out of memory warnings
+**Solutions**:
+- **Close Unused Sessions**: Each session uses ~200-500MB
+- **Restart Application**: Clears any memory leaks
+- **Reduce Resolution**: Lower memory per session
+- **System Upgrade**: Consider more RAM for multi-session use
 
-**"Your credentials did not work"**
-- Verify username format (try `domain\username` or `username@domain`)
-- Check if password has recently changed
-- Try connecting with a different account
+### AI Assistant Issues
 
-### Getting Help
+#### 🤖 AI Assistant Not Responding
+**Symptoms**: AI chat shows "..." but no response
+**Diagnosis**: Check logs at `%AppData%\RetroRDPClient\logs\rdpclient.log`
 
-1. **Check the AI Assistant**: Ask AssistBot for specific troubleshooting help
-2. **Performance Monitor**: Review system metrics for bottlenecks
-3. **Log Files**: Check `%AppData%\RetroRDPClient\logs\rdpclient.log`
-4. **System Requirements**: Verify your system meets minimum requirements
+**Solutions**:
+1. **Restart Application**: Reinitializes AI service
+2. **Check Models**: Ensure AI models are properly detected
+3. **Fallback Mode**: AI works without models (reduced capabilities)
+4. **Clear Cache**: Delete AI service cache files
+
+#### 🧠 AI Commands Not Working
+**Symptoms**: AI doesn't understand commands or gives generic responses
+**Solutions**:
+- **Use Natural Language**: "connect to server1" instead of technical syntax
+- **Be Specific**: Include server names, usernames in commands
+- **Check Examples**: See User Guide for working command examples
+- **Restart AI Service**: Application restart reinitializes AI
+
+### MCP Server Issues (AI Integration)
+
+#### 🔌 MCP Server Won't Start
+**Symptoms**: `dotnet run` fails in MCPServer project
+**Solutions**:
+1. **Port Conflict**: Check if port 5000 is already in use
+2. **Build First**: `dotnet build --configuration Release`
+3. **Permissions**: Run as administrator if needed
+4. **Check Logs**: Review console output for specific errors
+
+#### 📡 MCP Server Not Accessible
+**Symptoms**: Can't reach http://localhost:5000/mcp/health
+**Solutions**:
+- **Firewall**: Allow port 5000 through Windows Firewall
+- **Antivirus**: Add MCP server to exclusions
+- **URL Check**: Verify correct URL format
+- **Service Status**: Confirm MCP server is actually running
+
+### Advanced Troubleshooting
+
+#### 📊 Using Health Check Script
+The automated health check identifies most issues:
+```bash
+scripts/health-check.sh
+```
+
+**Interpreting Results**:
+- ✅ **Green**: Feature working correctly
+- ⚠️ **Yellow**: Warning, may have limitations
+- ❌ **Red**: Critical issue, needs fixing
+
+#### 📝 Log Analysis
+**Log Locations**:
+- **Windows**: `%AppData%\RetroRDPClient\logs\rdpclient.log`
+- **Linux/Mac**: `~/.local/share/RetroRDPClient/logs/rdpclient.log`
+
+**Key Log Entries**:
+- `RDP connection attempt`: Shows connection details
+- `Failed to...`: Error conditions
+- `Performance warning`: Resource usage alerts
+- `AI command...`: AI assistant activity
+
+**Log Cleanup**: Logs auto-rotate daily and keep 7 days of history.
+
+### Getting Additional Help
+
+#### 📞 Support Channels
+1. **Built-in Help**: Ask the AI assistant for help!
+2. **GitHub Issues**: Report bugs or request features
+3. **Documentation**: Check User Guide and Setup Guide
+4. **Health Check**: Run diagnostic scripts
+
+#### 🐛 Reporting Issues
+When reporting problems, please include:
+- **RetroRDP version**: Check About dialog
+- **Operating system**: Windows version and build
+- **Error messages**: Exact text from error dialogs
+- **Steps to reproduce**: What you did before the issue
+- **Log excerpts**: Relevant portions (remove sensitive data)
+
+**Privacy**: Never include passwords, server names, or credentials in reports.
+
+---
+
+**💡 Pro Tip**: Most issues can be resolved by running the health check script and following its recommendations!
 
 ## 🚀 Advanced Features
 

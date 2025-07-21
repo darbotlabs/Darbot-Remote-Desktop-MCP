@@ -113,12 +113,10 @@ namespace RetroRDPClient.Tests
         public void PerformanceWarning_ShouldFireWhenThresholdsExceeded()
         {
             // Arrange
-            bool warningFired = false;
             PerformanceWarningEventArgs? capturedEventArgs = null;
 
             _performanceService.PerformanceWarning += (sender, args) =>
             {
-                warningFired = true;
                 capturedEventArgs = args;
             };
 
