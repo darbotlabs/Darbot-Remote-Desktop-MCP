@@ -8,6 +8,8 @@ This application serves as a modern successor to Microsoft's retired Remote Desk
 - **Retro Cyber Aesthetics**: Dark theme with neon color palette and cyberpunk elements
 - **Modern Fluent Design**: Windows 11 design principles with acrylic/mica materials
 - **Multi-Session Support**: Tabbed interface for managing multiple RDP connections
+- **SSH Connectivity**: Secure file transfer (SFTP) and terminal access to Linux/Ubuntu servers
+- **Cross-Platform File Management**: Transfer files between Windows and Linux systems
 - **Local AI Integration**: Offline AI assistant powered by Microsoft Phi-4 models
 - **Windows Foundry Local**: Privacy-first local AI without internet dependency
 
@@ -15,6 +17,7 @@ This application serves as a modern successor to Microsoft's retired Remote Desk
 
 - **RetroRDPClient**: WPF desktop application (.NET 8)
 - **RetroRDPWeb**: ASP.NET Core Web API for remote status and helper services
+- **SSH Integration**: SFTP file transfer and terminal console for Linux management
 - **Shared Libraries**: Common models and utilities
 
 ## Getting Started
@@ -77,6 +80,31 @@ For experienced users who prefer manual setup:
 - **[Setup Guide](docs/Setup-Guide.md)**: Comprehensive setup instructions
 - **[User Guide](UserGuide.md)**: Complete feature documentation  
 - **[AI Integration Guide](docs/Copilot-Studio-MCP-Integration-Guide.md)**: Microsoft Copilot Studio setup
+- **[Ubuntu RDP & SSH Guide](docs/Ubuntu-RDP-SSH-Guide.md)**: Linux connectivity and file transfer
+
+## 🔒 SSH & Linux Integration
+
+RetroRDP now includes comprehensive SSH support for Linux/Ubuntu server management:
+
+### SSH File Transfer (SFTP)
+- **Dual-pane file browser**: Windows ↔ Linux file management
+- **Secure file transfers**: Upload/download files via encrypted SFTP
+- **Directory management**: Create folders, navigate, delete files
+- **Cross-platform compatibility**: Connect from Windows to any Linux server
+
+### SSH Terminal Console  
+- **Full terminal access**: Command-line interface to Ubuntu/Linux servers
+- **Real-time execution**: Run commands directly on remote systems
+- **Secure connections**: Encrypted SSH protocol
+- **Session management**: Multiple concurrent SSH sessions
+
+### Connection Types
+- **🖥️ RDP Sessions**: Traditional Windows Remote Desktop
+- **🔒 SFTP File Transfer**: Secure file management for Linux systems  
+- **🐧 SSH Terminal**: Command-line access to Ubuntu servers
+- **🌐 Cross-Platform**: Windows → Linux connectivity made simple
+
+*See the [Ubuntu RDP & SSH Guide](docs/Ubuntu-RDP-SSH-Guide.md) for detailed setup instructions and open-source Ubuntu RDP solutions.*
 
 ## Development Status
 

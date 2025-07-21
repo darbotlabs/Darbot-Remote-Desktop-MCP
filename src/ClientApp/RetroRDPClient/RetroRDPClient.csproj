@@ -41,6 +41,10 @@
     <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <!-- Performance monitoring -->
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+    <!-- SSH and SFTP connectivity -->
+    <PackageReference Include="SSH.NET" Version="2024.1.0" />
+    <!-- Visual Basic runtime for InputBox functionality -->
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
   </ItemGroup>
 
   <!-- Project references -->
@@ -89,6 +93,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="WPF\SshFileTransferWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WPF\SshTerminalWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="RetroCyberTheme.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -107,6 +119,14 @@
     </Compile>
     <Compile Include="WPF\AboutDialog.xaml.cs">
       <DependentUpon>AboutDialog.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WPF\SshFileTransferWindow.xaml.cs">
+      <DependentUpon>SshFileTransferWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WPF\SshTerminalWindow.xaml.cs">
+      <DependentUpon>SshTerminalWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

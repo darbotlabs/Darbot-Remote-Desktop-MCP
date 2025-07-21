@@ -1,19 +1,50 @@
 using RetroRDP.Shared.Models;
 using System;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace RetroRDPClient.WPF
 {
     /// <summary>
-    /// Connection dialog for creating new RDP sessions
+    /// Connection dialog for creating new RDP/SSH sessions
     /// </summary>
     public partial class ConnectionDialog : Window
     {
         public RdpConnectionRequest? ConnectionRequest { get; private set; }
+        public string ConnectionType { get; private set; } = "RDP";
 
         public ConnectionDialog()
         {
             InitializeComponent();
+        }
+
+        private void ConnectionTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ConnectionTypeComboBox.SelectedItem is ComboBoxItem selectedItem)
+            {
+                var connectionType = selectedItem.Tag?.ToString() ?? "RDP";
+                ConnectionType = connectionType;
+
+                // Update default values based on connection type
+                switch (connectionType)
+                {
+                    case "RDP":
+                        PortTextBox.Text = "3389";
+                        UsernameTextBox.Text = "Administrator";
+                        SessionNameTextBox.Text = "RDP Session";
+                        break;
+                    case "SFTP":
+                        PortTextBox.Text = "22";
+                        UsernameTextBox.Text = "root";
+                        SessionNameTextBox.Text = "SFTP Session";
+                        break;
+                    case "SSH":
+                        PortTextBox.Text = "22";
+                        UsernameTextBox.Text = "root";
+                        SessionNameTextBox.Text = "SSH Terminal";
+                        break;
+                }
+            }
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
@@ -45,50 +76,93 @@ namespace RetroRDPClient.WPF
                     return;
                 }
 
-                if (!int.TryParse(ScreenWidthTextBox.Text, out int width) || width < 640)
+                // Handle based on connection type
+                if (ConnectionType == "SFTP")
                 {
-                    MessageBox.Show("Please enter a valid screen width (minimum 640).", "Validation Error", 
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                    ScreenWidthTextBox.Focus();
+                    // Open SSH File Transfer window
+                    var fileTransferWindow = new SshFileTransferWindow();
+                    fileTransferWindow.HostTextBox.Text = HostTextBox.Text.Trim();
+                    fileTransferWindow.UsernameTextBox.Text = UsernameTextBox.Text.Trim();
+                    fileTransferWindow.PortTextBox.Text = PortTextBox.Text;
+                    fileTransferWindow.PasswordBox.Password = PasswordBox.Password;
+                    fileTransferWindow.Show();
+                    
+                    DialogResult = true;
+                    Close();
+                    return;
+                }
+                else if (ConnectionType == "SSH")
+                {
+                    // Open SSH Terminal window
+                    var terminalWindow = new SshTerminalWindow();
+                    terminalWindow.HostTextBox.Text = HostTextBox.Text.Trim();
+                    terminalWindow.UsernameTextBox.Text = UsernameTextBox.Text.Trim();
+                    terminalWindow.PortTextBox.Text = PortTextBox.Text;
+                    terminalWindow.Show();
+                    
+                    DialogResult = true;
+                    Close();
                     return;
                 }
 
-                if (!int.TryParse(ScreenHeightTextBox.Text, out int height) || height < 480)
+                // For RDP connections, we need additional fields
+                if (ConnectionType == "RDP")
                 {
-                    MessageBox.Show("Please enter a valid screen height (minimum 480).", "Validation Error", 
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                    ScreenHeightTextBox.Focus();
-                    return;
+                    // Find the screen resolution controls (these should exist in the original XAML)
+                    var screenWidthTextBox = FindName("ScreenWidthTextBox") as TextBox;
+                    var screenHeightTextBox = FindName("ScreenHeightTextBox") as TextBox;
+                    var colorDepthComboBox = FindName("ColorDepthComboBox") as ComboBox;
+                    var fullScreenCheckBox = FindName("FullScreenCheckBox") as CheckBox;
+
+                    int width = 1024, height = 768, colorDepth = 32;
+                    bool fullScreen = false;
+
+                    if (screenWidthTextBox != null && !int.TryParse(screenWidthTextBox.Text, out width) || width < 640)
+                    {
+                        width = 1024; // Default value
+                    }
+
+                    if (screenHeightTextBox != null && !int.TryParse(screenHeightTextBox.Text, out height) || height < 480)
+                    {
+                        height = 768; // Default value
+                    }
+
+                    if (colorDepthComboBox != null)
+                    {
+                        colorDepth = colorDepthComboBox.SelectedIndex switch
+                        {
+                            0 => 15,
+                            1 => 16,
+                            2 => 24,
+                            3 => 32,
+                            _ => 32
+                        };
+                    }
+
+                    if (fullScreenCheckBox != null)
+                    {
+                        fullScreen = fullScreenCheckBox.IsChecked == true;
+                    }
+
+                    // Create connection request
+                    ConnectionRequest = new RdpConnectionRequest
+                    {
+                        Host = HostTextBox.Text.Trim(),
+                        Username = UsernameTextBox.Text.Trim(),
+                        Password = PasswordBox.Password,
+                        SessionName = string.IsNullOrWhiteSpace(SessionNameTextBox.Text) 
+                            ? HostTextBox.Text.Trim() 
+                            : SessionNameTextBox.Text.Trim(),
+                        Port = port,
+                        ScreenWidth = width,
+                        ScreenHeight = height,
+                        ColorDepth = colorDepth,
+                        FullScreen = fullScreen
+                    };
+
+                    DialogResult = true;
+                    Close();
                 }
-
-                // Get color depth from combo box
-                int colorDepth = ColorDepthComboBox.SelectedIndex switch
-                {
-                    0 => 15,
-                    1 => 16,
-                    2 => 24,
-                    3 => 32,
-                    _ => 32
-                };
-
-                // Create connection request
-                ConnectionRequest = new RdpConnectionRequest
-                {
-                    Host = HostTextBox.Text.Trim(),
-                    Username = UsernameTextBox.Text.Trim(),
-                    Password = PasswordBox.Password,
-                    SessionName = string.IsNullOrWhiteSpace(SessionNameTextBox.Text) 
-                        ? HostTextBox.Text.Trim() 
-                        : SessionNameTextBox.Text.Trim(),
-                    Port = port,
-                    ScreenWidth = width,
-                    ScreenHeight = height,
-                    ColorDepth = colorDepth,
-                    FullScreen = FullScreenCheckBox.IsChecked == true
-                };
-
-                DialogResult = true;
-                Close();
             }
             catch (Exception ex)
             {

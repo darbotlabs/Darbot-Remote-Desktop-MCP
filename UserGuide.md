@@ -9,6 +9,9 @@ Welcome to **RetroRDP Client** - the ultimate retro-futuristic Remote Desktop ex
 - [Quick Start Guide](#quick-start-guide)
 - [User Interface Overview](#user-interface-overview)
 - [Creating RDP Connections](#creating-rdp-connections)
+- [SSH File Transfer (SFTP)](#ssh-file-transfer-sftp)
+- [SSH Terminal Console](#ssh-terminal-console)
+- [Linux & Ubuntu Integration](#linux--ubuntu-integration)
 - [AI Assistant Usage](#ai-assistant-usage)
 - [Performance Optimization](#performance-optimization)
 - [Session Management](#session-management)
@@ -120,19 +123,237 @@ Choose from three optimized presets:
 - All visual effects enabled
 - Best for high-speed local networks
 
+## 🔒 SSH File Transfer (SFTP)
+
+RetroRDP includes a powerful SSH File Transfer manager for seamless file operations between Windows and Linux systems.
+
+### Accessing SSH File Transfer
+
+**From Navigation Menu:**
+1. Click "🔒 SSH File Transfer" in the left sidebar
+2. The SSH File Transfer window opens with dual-pane interface
+
+**From Connection Dialog:**
+1. Click "New Session" or press the connection button
+2. Select "🔒 SSH File Transfer (SFTP)" from Connection Type dropdown
+3. Enter connection details and click Connect
+
+### Connection Setup
+
+**Required Fields:**
+- **Server Address**: IP address or hostname of Linux server (e.g., `192.168.1.100`)
+- **Username**: SSH username (e.g., `root`, `ubuntu`, `your-username`)
+- **Password**: SSH password for authentication
+- **Port**: SSH port (default: 22)
+
+**Connection Example:**
+```
+Connection Type: SSH File Transfer (SFTP)
+Server Address: 192.168.1.100
+Username: ubuntu
+Port: 22
+Password: [your-password]
+```
+
+### File Management Features
+
+**Dual-Pane Browser:**
+- **Left Pane**: Windows local files and folders
+- **Right Pane**: Linux remote files and folders
+- **Navigation**: Double-click folders to navigate, use ".." to go up
+
+**File Operations:**
+- **Upload**: Select local files → click "➡️ Upload" → transfers to remote
+- **Download**: Select remote files → click "⬅️ Download" → transfers to local
+- **Create Folder**: Click "📁+ New Folder" → creates remote directory
+- **Delete**: Select files/folders → click "🗑️ Delete" → removes from remote
+
+**File Details:**
+- **Name**: File/folder name
+- **Size**: File size in human-readable format
+- **Permissions**: Linux file permissions (for remote files)
+- **Modified Date**: Last modification timestamp
+
+### Transfer Progress
+
+- **Progress Bar**: Shows upload/download progress
+- **Status Messages**: Real-time operation feedback
+- **Bulk Operations**: Transfer multiple files simultaneously
+
+## 🐧 SSH Terminal Console
+
+Access Linux/Ubuntu servers directly through a secure SSH terminal interface.
+
+### Accessing SSH Terminal
+
+**From Navigation Menu:**
+1. Click "🐧 SSH Terminal" in the left sidebar
+2. The SSH Terminal window opens with console interface
+
+**From Connection Dialog:**
+1. Click "New Session" 
+2. Select "🐧 SSH Terminal Console" from Connection Type dropdown
+3. Enter connection details and connect
+
+### Terminal Features
+
+**Full Terminal Emulation:**
+- **Real-time Commands**: Execute commands directly on remote server
+- **Command History**: Use Up/Down arrows for command history
+- **Terminal Output**: Full-color terminal output with proper formatting
+- **Auto-scrolling**: Terminal automatically scrolls to show latest output
+
+**Connection Management:**
+- **Secure Authentication**: Password-based SSH authentication
+- **Session Persistence**: Terminal session stays active until disconnection
+- **Multiple Sessions**: Open multiple SSH terminals to different servers
+
+### Common Use Cases
+
+**System Administration:**
+```bash
+# Check system status
+sudo systemctl status
+
+# Update packages
+sudo apt update && sudo apt upgrade
+
+# Monitor system resources  
+htop
+
+# Check disk usage
+df -h
+
+# View logs
+tail -f /var/log/syslog
+```
+
+**File Operations:**
+```bash
+# Navigate directories
+cd /home/user/documents
+
+# List files with details
+ls -la
+
+# Copy files
+cp source.txt destination.txt
+
+# Move/rename files
+mv oldname.txt newname.txt
+
+# Create directories
+mkdir new-folder
+```
+
+**Network Operations:**
+```bash
+# Check network connectivity
+ping google.com
+
+# View network configuration
+ip addr show
+
+# Check open ports
+netstat -tulpn
+
+# Download files
+wget https://example.com/file.zip
+```
+
+## 🌐 Linux & Ubuntu Integration
+
+RetroRDP provides comprehensive connectivity solutions for Linux and Ubuntu systems.
+
+### Connection Types Overview
+
+| Connection Type | Purpose | Protocol | Port | Use Case |
+|----------------|---------|----------|------|----------|
+| **🖥️ RDP** | Remote Desktop | RDP | 3389 | Full Ubuntu desktop access |
+| **🔒 SFTP** | File Transfer | SSH/SFTP | 22 | File management and transfer |
+| **🐧 SSH** | Terminal Access | SSH | 22 | Command-line administration |
+
+### Ubuntu RDP Server Setup
+
+For remote desktop access to Ubuntu machines:
+
+**Install XRDP:**
+```bash
+sudo apt update
+sudo apt install -y xrdp
+sudo systemctl enable xrdp
+sudo systemctl start xrdp
+sudo ufw allow 3389/tcp
+```
+
+**Then connect via RetroRDP:**
+- Connection Type: Remote Desktop (RDP)
+- Server Address: [Ubuntu-IP]
+- Username: [Ubuntu-username]
+- Port: 3389
+
+### SSH Server Setup
+
+For SSH file transfer and terminal access:
+
+**Install OpenSSH Server:**
+```bash
+sudo apt update
+sudo apt install -y openssh-server
+sudo systemctl enable ssh
+sudo systemctl start ssh
+sudo ufw allow 22/tcp
+```
+
+**Security Configuration:**
+```bash
+# Edit SSH config
+sudo nano /etc/ssh/sshd_config
+
+# Recommended settings:
+PermitRootLogin yes  # or 'no' for security
+PasswordAuthentication yes
+PubkeyAuthentication yes
+
+# Restart SSH
+sudo systemctl restart ssh
+```
+
+### Cross-Platform Workflow
+
+**Typical Linux Management Workflow:**
+1. **Connect via SSH Terminal** → System administration and configuration
+2. **Use SFTP File Transfer** → Upload configuration files, download logs
+3. **Connect via RDP** → GUI applications and desktop work
+4. **AI Assistant** → Get help with Linux commands and troubleshooting
+
+**File Transfer Examples:**
+- **Windows → Linux**: Upload configuration files, deployment packages
+- **Linux → Windows**: Download logs, backups, reports
+- **Batch Operations**: Transfer multiple files efficiently
+
 ## 🤖 AI Assistant Usage
 
-The AI Assistant (AssistBot) is your intelligent companion for managing RDP sessions. It understands natural language and can perform complex operations through simple chat commands.
+The AI Assistant (AssistBot) is your intelligent companion for managing RDP and SSH sessions. It understands natural language and can perform complex operations through simple chat commands.
 
 ### Basic Commands
 
-**Connection Management:**
+**RDP Connection Management:**
 ```
 "connect to server.example.com as admin"
 "rdp to 192.168.1.100"
 "disconnect session 1"
 "close all connections"
 "show me all active sessions"
+```
+
+**SSH & File Transfer:**
+```
+"open ssh to 192.168.1.100"
+"start file transfer to ubuntu server"
+"connect ssh terminal to my linux server"
+"help with linux file transfer"
+"show me ssh connection options"
 ```
 
 **Screenshots & Monitoring:**
@@ -150,11 +371,20 @@ The AI Assistant (AssistBot) is your intelligent companion for managing RDP sess
 "switch to performance mode"
 ```
 
+**Cross-Platform Operations:**
+```
+"help with ubuntu rdp setup"
+"show me linux connection options"
+"how do I transfer files to linux?"
+"what's the best way to manage ubuntu servers?"
+```
+
 **Chained Commands:**
 ```
 "connect to server1 and take a screenshot"
 "disconnect all sessions then show status"
 "switch to quality mode and connect to host"
+"open ssh terminal and file transfer to same server"
 ```
 
 ### AI Assistant Features
@@ -337,6 +567,83 @@ The system automatically suggests optimizations:
 - Test login locally on target machine first
 - Try different username formats
 - Reset password if necessary
+
+### SSH and File Transfer Issues
+
+#### ❌ "SSH Connection Failed" or "Connection Timeout"
+**Symptoms**: Can't connect to SSH server, timeout errors for SFTP/SSH Terminal
+**Diagnosis Steps**:
+1. **Network Test**: `ping [linux-server-ip]`
+2. **SSH Port Test**: `telnet [server-ip] 22`
+3. **SSH Service Check**: Ensure SSH server is running on target
+
+**Solutions**:
+- **Install SSH Server**: `sudo apt install openssh-server`
+- **Start SSH Service**: `sudo systemctl start ssh && sudo systemctl enable ssh`
+- **Firewall**: `sudo ufw allow 22/tcp`
+- **Network**: Verify connectivity to Linux server
+- **Credentials**: Double-check SSH username/password
+- **Port**: Confirm SSH port (default 22, may be custom)
+
+#### ❌ "Permission Denied" for SSH
+**Symptoms**: Authentication failed, access denied for SSH/SFTP
+**Common Issues**:
+- Wrong SSH username/password
+- SSH server doesn't allow password authentication
+- User account doesn't exist on Linux server
+- SSH service not configured properly
+
+**Solutions**:
+1. **Test SSH Locally**: Try `ssh username@server-ip` from command line
+2. **Check SSH Config**: Edit `/etc/ssh/sshd_config` on Linux server:
+   ```bash
+   PermitRootLogin yes
+   PasswordAuthentication yes
+   PubkeyAuthentication yes
+   ```
+3. **Restart SSH**: `sudo systemctl restart ssh`
+4. **Create User**: Add user account on Linux server if needed
+5. **Check Firewall**: Ensure port 22 is open
+
+#### ❌ "SFTP File Transfer Fails"
+**Symptoms**: Files won't upload/download, transfer errors
+**Solutions**:
+- **Check Permissions**: Ensure write access to target directories
+- **Disk Space**: Verify sufficient space on target system
+- **File Path**: Avoid special characters in file/folder names
+- **Large Files**: Transfer may timeout - try smaller batches
+- **Network**: Check stable network connection during transfer
+
+#### ❌ "SSH Terminal Commands Don't Work"
+**Symptoms**: Commands fail, terminal unresponsive
+**Solutions**:
+- **Check Connection**: Ensure SSH session is still active
+- **Reconnect**: Disconnect and reconnect if session is stale
+- **Permissions**: Some commands require `sudo` privileges
+- **Path Issues**: Use full paths for commands if needed
+- **Terminal Type**: SSH terminal emulates basic ANSI terminal
+
+#### ⚠️ Ubuntu RDP Issues
+**Symptoms**: Can't connect to Ubuntu via RDP, black screen
+**Solutions**:
+1. **Install XRDP**: `sudo apt install xrdp`
+2. **Install Desktop Environment**:
+   ```bash
+   # For XFCE (recommended)
+   sudo apt install xfce4 xfce4-goodies
+   echo "xfce4-session" > ~/.xsession
+   
+   # For GNOME
+   sudo apt install ubuntu-desktop-minimal
+   ```
+3. **Configure XRDP**: 
+   ```bash
+   sudo systemctl enable xrdp
+   sudo systemctl start xrdp
+   sudo ufw allow 3389/tcp
+   ```
+4. **User Session**: Log out of local Ubuntu session before RDP
+5. **Color Depth**: Use 16-bit or 24-bit color depth for better compatibility
 
 ### Performance Issues
 

@@ -45,6 +45,22 @@
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
+                <!-- Connection Type -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="🔗 Connection Type:" 
+                               Style="{StaticResource CyberText}"
+                               FontSize="12"
+                               Margin="0,0,0,5"/>
+                    <ComboBox x:Name="ConnectionTypeComboBox"
+                              Style="{StaticResource CyberComboBox}"
+                              SelectedIndex="0"
+                              SelectionChanged="ConnectionTypeComboBox_SelectionChanged">
+                        <ComboBoxItem Content="🖥️ Remote Desktop (RDP)" Tag="RDP"/>
+                        <ComboBoxItem Content="🔒 SSH File Transfer (SFTP)" Tag="SFTP"/>
+                        <ComboBoxItem Content="🐧 SSH Terminal Console" Tag="SSH"/>
+                    </ComboBox>
+                </StackPanel>
+
                 <!-- Session Name -->
                 <StackPanel Margin="0,0,0,15">
                     <TextBlock Text="🏷️ Session Name:" 
@@ -71,14 +87,14 @@
 
                 <!-- Port -->
                 <StackPanel Margin="0,0,0,15">
-                    <TextBlock Text="🔌 Port:" 
+                    <TextBlock x:Name="PortLabel" Text="🔌 Port:" 
                                Style="{StaticResource CyberText}"
                                FontSize="12"
                                Margin="0,0,0,5"/>
                     <TextBox x:Name="PortTextBox"
                              Style="{StaticResource CyberTextBox}"
                              Text="3389"
-                             ToolTip="RDP port (default: 3389)"/>
+                             ToolTip="Connection port (RDP: 3389, SSH: 22)"/>
                 </StackPanel>
 
                 <!-- Username -->
@@ -94,7 +110,7 @@
                 </StackPanel>
 
                 <!-- Password -->
-                <StackPanel Margin="0,0,0,15">
+                <StackPanel x:Name="PasswordPanel" Margin="0,0,0,15">
                     <TextBlock Text="🔐 Password:" 
                                Style="{StaticResource CyberText}"
                                FontSize="12"
@@ -102,6 +118,7 @@
                     <PasswordBox x:Name="PasswordBox"
                                  Style="{StaticResource CyberPasswordBox}"
                                  ToolTip="Password for authentication"/>
+                </StackPanel>
                 </StackPanel>
 
                 <!-- Advanced Settings Expander -->
