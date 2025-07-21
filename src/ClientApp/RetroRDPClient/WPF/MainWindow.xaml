@@ -100,6 +100,8 @@
                                  BorderThickness="0"
                                  Background="Transparent">
                             <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="🖥️ New RDP Session"/>
+                            <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="🔒 SSH File Transfer"/>
+                            <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="🐧 SSH Terminal"/>
                             <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="📋 Saved Connections"/>
                             <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="⚙️ Settings"/>
                             <ListBoxItem Style="{StaticResource CyberListBoxItem}" Content="📊 Performance Monitor"/>

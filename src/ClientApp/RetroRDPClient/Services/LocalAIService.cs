@@ -41,7 +41,7 @@ Keep responses concise, helpful, and maintain the retro-cyber theme when appropr
             _logger = logger;
         }
 
-        public async Task<bool> InitializeAsync(CancellationToken cancellationToken = default)
+        public Task<bool> InitializeAsync(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -69,12 +69,12 @@ Keep responses concise, helpful, and maintain the retro-cyber theme when appropr
 
                 IsInitialized = true;
                 _logger?.LogInformation($"Local AI Service initialized: {CurrentModelName}");
-                return true;
+                return Task.FromResult(true);
             }
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to initialize Local AI Service");
-                return false;
+                return Task.FromResult(false);
             }
         }
 

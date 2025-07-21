@@ -8,6 +8,8 @@ This application serves as a modern successor to Microsoft's retired Remote Desk
 - **Retro Cyber Aesthetics**: Dark theme with neon color palette and cyberpunk elements
 - **Modern Fluent Design**: Windows 11 design principles with acrylic/mica materials
 - **Multi-Session Support**: Tabbed interface for managing multiple RDP connections
+- **SSH Connectivity**: Secure file transfer (SFTP) and terminal access to Linux/Ubuntu servers
+- **Cross-Platform File Management**: Transfer files between Windows and Linux systems
 - **Local AI Integration**: Offline AI assistant powered by Microsoft Phi-4 models
 - **Windows Foundry Local**: Privacy-first local AI without internet dependency
 
@@ -15,48 +17,94 @@ This application serves as a modern successor to Microsoft's retired Remote Desk
 
 - **RetroRDPClient**: WPF desktop application (.NET 8)
 - **RetroRDPWeb**: ASP.NET Core Web API for remote status and helper services
+- **SSH Integration**: SFTP file transfer and terminal console for Linux management
 - **Shared Libraries**: Common models and utilities
 
 ## Getting Started
 
-### Prerequisites
+### 🚀 Quick Setup (5 Minutes)
 
-- .NET 8.0 SDK or later
-- Windows 10/11
-- Visual Studio 2022 (recommended) or Visual Studio Code
+**New to RetroRDP?** Use our automated setup wizard:
 
-### Setup Instructions
+**Windows:**
+```cmd
+git clone https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP.git
+cd Darbot-Remote-Desktop-MCP
+scripts\setup-wizard.bat
+```
 
-1. Clone the repository:
+**Linux/macOS:**
+```bash
+git clone https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP.git
+cd Darbot-Remote-Desktop-MCP
+scripts/setup-wizard.sh
+```
+
+The wizard will guide you through:
+- ✅ System compatibility check
+- ✅ Automated build and configuration  
+- ✅ Performance optimization for your hardware
+- ✅ AI assistant setup
+- ✅ MCP server integration (optional)
+- ✅ Installation validation and testing
+
+### Manual Setup
+
+For experienced users who prefer manual setup:
+
+1. **Prerequisites Check**: Run the health check first
+   ```bash
+   scripts/health-check.sh
+   ```
+
+2. **Clone and Build**:
    ```bash
    git clone https://github.com/darbotlabs/Darbot-Remote-Desktop-MCP.git
    cd Darbot-Remote-Desktop-MCP
-   ```
-
-2. Restore dependencies:
-   ```bash
    dotnet restore
+   dotnet build --configuration Release
    ```
 
-3. Build the solution:
-   ```bash
-   dotnet build
-   ```
-
-4. Run the client application:
+3. **Run the Client**:
    ```bash
    dotnet run --project src/ClientApp/RetroRDPClient
    ```
 
-5. *(Optional)* Set up local AI with Phi-4 models:
-   - Download Phi-4 ONNX models from Microsoft or Hugging Face
-   - Place models in `src/ClientApp/RetroRDPClient/Models/` directory
-   - See [Windows Foundry Local Setup Guide](docs/Windows-Foundry-Local-Setup.md) for detailed instructions
-
-6. Run the web API (optional):
+4. **Optional: Start MCP Server** (for AI integration):
    ```bash
-   dotnet run --project src/WebApp/RetroRDPWeb
+   dotnet run --project src/MCPServer/RetroRDP.MCPServer
    ```
+
+### 📚 Complete Documentation
+
+- **[Setup Guide](docs/Setup-Guide.md)**: Comprehensive setup instructions
+- **[User Guide](UserGuide.md)**: Complete feature documentation  
+- **[AI Integration Guide](docs/Copilot-Studio-MCP-Integration-Guide.md)**: Microsoft Copilot Studio setup
+- **[Ubuntu RDP & SSH Guide](docs/Ubuntu-RDP-SSH-Guide.md)**: Linux connectivity and file transfer
+
+## 🔒 SSH & Linux Integration
+
+RetroRDP now includes comprehensive SSH support for Linux/Ubuntu server management:
+
+### SSH File Transfer (SFTP)
+- **Dual-pane file browser**: Windows ↔ Linux file management
+- **Secure file transfers**: Upload/download files via encrypted SFTP
+- **Directory management**: Create folders, navigate, delete files
+- **Cross-platform compatibility**: Connect from Windows to any Linux server
+
+### SSH Terminal Console  
+- **Full terminal access**: Command-line interface to Ubuntu/Linux servers
+- **Real-time execution**: Run commands directly on remote systems
+- **Secure connections**: Encrypted SSH protocol
+- **Session management**: Multiple concurrent SSH sessions
+
+### Connection Types
+- **🖥️ RDP Sessions**: Traditional Windows Remote Desktop
+- **🔒 SFTP File Transfer**: Secure file management for Linux systems  
+- **🐧 SSH Terminal**: Command-line access to Ubuntu servers
+- **🌐 Cross-Platform**: Windows → Linux connectivity made simple
+
+*See the [Ubuntu RDP & SSH Guide](docs/Ubuntu-RDP-SSH-Guide.md) for detailed setup instructions and open-source Ubuntu RDP solutions.*
 
 ## Development Status
 

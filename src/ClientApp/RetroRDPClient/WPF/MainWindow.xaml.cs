@@ -506,6 +506,32 @@ namespace RetroRDPClient
                 {
                     CreateNewSessionButton_Click(this, new RoutedEventArgs());
                 }
+                else if (content?.Contains("SSH File Transfer") == true)
+                {
+                    try
+                    {
+                        var fileTransferWindow = new SshFileTransferWindow();
+                        fileTransferWindow.Show();
+                        AddChatMessage("🤖 AssistBot: Opening SSH File Transfer window for Linux file management...", false);
+                    }
+                    catch (Exception ex)
+                    {
+                        AddChatMessage($"🤖 AssistBot: Error opening SSH File Transfer: {ex.Message}", false);
+                    }
+                }
+                else if (content?.Contains("SSH Terminal") == true)
+                {
+                    try
+                    {
+                        var terminalWindow = new SshTerminalWindow();
+                        terminalWindow.Show();
+                        AddChatMessage("🤖 AssistBot: Opening SSH Terminal for Ubuntu/Linux server management...", false);
+                    }
+                    catch (Exception ex)
+                    {
+                        AddChatMessage($"🤖 AssistBot: Error opening SSH Terminal: {ex.Message}", false);
+                    }
+                }
                 else if (content?.Contains("Settings") == true)
                 {
                     AddChatMessage("🤖 AssistBot: Settings panel coming soon in future updates!", false);
@@ -518,7 +544,7 @@ namespace RetroRDPClient
                 }
                 else if (content?.Contains("Security Status") == true)
                 {
-                    AddChatMessage("🤖 AssistBot: All connections use encrypted RDP protocol. Session credentials are stored securely.", false);
+                    AddChatMessage("🤖 AssistBot: All connections use encrypted protocols (RDP/SSH). Session credentials are stored securely.", false);
                 }
                 else if (content?.Contains("Saved Connections") == true)
                 {
