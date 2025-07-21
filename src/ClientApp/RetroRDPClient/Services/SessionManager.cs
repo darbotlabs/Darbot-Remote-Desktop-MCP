@@ -42,7 +42,7 @@ namespace RetroRDPClient.Services
             return session;
         }
 
-        public async Task<string?> StartSessionAsync(RdpConnectionRequest connectionRequest, CancellationToken cancellationToken = default)
+        public Task<string?> StartSessionAsync(RdpConnectionRequest connectionRequest, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace RetroRDPClient.Services
                 if (string.IsNullOrWhiteSpace(connectionRequest.Host))
                 {
                     _logger?.LogWarning("Invalid connection request: Host is required");
-                    return null;
+                    return Task.FromResult<string?>(null);
                 }
 
                 // Create session
@@ -99,12 +99,12 @@ namespace RetroRDPClient.Services
                 _ = Task.Run(async () => await ConnectSessionAsync(session, cancellationToken), cancellationToken);
 
                 _logger?.LogInformation("Session {SessionId} created for {Host}", session.SessionId, session.Host);
-                return session.SessionId;
+                return Task.FromResult<string?>(session.SessionId);
             }
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to start RDP session to {Host}", connectionRequest.Host);
-                return null;
+                return Task.FromResult<string?>(null);
             }
         }
 
@@ -154,14 +154,14 @@ namespace RetroRDPClient.Services
             }
         }
 
-        public async Task<bool> ReconnectSessionAsync(string sessionId, CancellationToken cancellationToken = default)
+        public Task<bool> ReconnectSessionAsync(string sessionId, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (!_sessions.TryGetValue(sessionId, out var session))
                 {
                     _logger?.LogWarning("Session {SessionId} not found for reconnect", sessionId);
-                    return false;
+                    return Task.FromResult(false);
                 }
 
                 _logger?.LogInformation("Reconnecting session {SessionId} to {Host}", sessionId, session.Host);
@@ -172,13 +172,13 @@ namespace RetroRDPClient.Services
                 // Attempt reconnection
                 _ = Task.Run(async () => await ConnectSessionAsync(session, cancellationToken), cancellationToken);
 
-                return true;
+                return Task.FromResult(true);
             }
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to reconnect session {SessionId}", sessionId);
                 UpdateSessionStatus(sessionId, RdpSessionStatus.Failed, ex.Message);
-                return false;
+                return Task.FromResult(false);
             }
         }
 

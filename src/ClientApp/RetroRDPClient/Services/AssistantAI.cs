@@ -243,7 +243,7 @@ Be helpful and maintain the retro-cyber assistant personality while being precis
                     conversationContext.Messages.Add(new ConversationMessage
                     {
                         Role = "assistant",
-                        Content = response.Message,
+                        Content = response.Message ?? "Command processed",
                         Timestamp = DateTime.UtcNow,
                         Metadata = new Dictionary<string, object>
                         {

@@ -183,7 +183,7 @@ namespace RetroRDPClient.Services
             }
         }
 
-        public async Task<bool> DeleteProfileAsync(string name, CancellationToken cancellationToken = default)
+        public Task<bool> DeleteProfileAsync(string name, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -199,12 +199,12 @@ namespace RetroRDPClient.Services
                 _profileCache.Remove(name);
 
                 _logger?.LogInformation("Profile '{ProfileName}' deleted successfully", name);
-                return true;
+                return Task.FromResult(true);
             }
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Failed to delete profile '{ProfileName}'", name);
-                return false;
+                return Task.FromResult(false);
             }
         }
 

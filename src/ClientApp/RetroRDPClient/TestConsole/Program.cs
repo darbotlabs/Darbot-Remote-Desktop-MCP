@@ -7,9 +7,18 @@ namespace RetroRDPClient.TestConsole
     /// Simple console application to test the Local AI Service
     /// Useful for verifying Phi-4 model integration without the full WPF UI
     /// </summary>
-    class Program
+    public class Program
     {
-        static async Task Main(string[] args)
+        /// <summary>
+        /// Entry point for testing the Local AI Service
+        /// Call Program.TestAI() from the main application to run AI tests
+        /// </summary>
+        public static async Task TestAI()
+        {
+            await TestMain(Array.Empty<string>());
+        }
+
+        static async Task TestMain(string[] args)
         {
             Console.WriteLine("🤖 Retro RDP Client - Local AI Test Console");
             Console.WriteLine("============================================");

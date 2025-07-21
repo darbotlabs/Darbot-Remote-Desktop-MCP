@@ -24,7 +24,7 @@ namespace RetroRDP.MCPServer.Services
             _resourceProviders = new List<IMCPResourceProvider>();
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken = default)
+        public Task StartAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Starting MCP server...");
             
@@ -36,13 +36,15 @@ namespace RetroRDP.MCPServer.Services
             
             _logger.LogInformation("MCP server started successfully with {ToolCount} tools and {ResourceCount} resource providers", 
                 _tools.Count, _resourceProviders.Count);
+            return Task.CompletedTask;
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken = default)
+        public Task StopAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("Stopping MCP server...");
             // Cleanup if needed
             _logger.LogInformation("MCP server stopped");
+            return Task.CompletedTask;
         }
 
         private void RegisterTools()
@@ -123,11 +125,11 @@ namespace RetroRDP.MCPServer.Services
             }
         }
 
-        private async Task<MCPResponse> HandleInitializeAsync(MCPRequest request, CancellationToken cancellationToken)
+        private Task<MCPResponse> HandleInitializeAsync(MCPRequest request, CancellationToken cancellationToken)
         {
             _initialized = true;
             
-            return new MCPInitializeResponse
+            return Task.FromResult<MCPResponse>(new MCPInitializeResponse
             {
                 Id = request.Id,
                 Result = new MCPInitializeResponse.InitializeResult
@@ -146,7 +148,7 @@ namespace RetroRDP.MCPServer.Services
                         Logging = true
                     }
                 }
-            };
+            });
         }
 
         private MCPResponse HandleToolsList(MCPRequest request)
@@ -256,14 +258,14 @@ namespace RetroRDP.MCPServer.Services
             };
         }
 
-        private async Task<MCPResponse> HandleResourceReadAsync(MCPRequest request, CancellationToken cancellationToken)
+        private Task<MCPResponse> HandleResourceReadAsync(MCPRequest request, CancellationToken cancellationToken)
         {
             // Implementation for reading resources
-            return new MCPErrorResponse
+            return Task.FromResult<MCPResponse>(new MCPErrorResponse
             {
                 Id = request.Id,
                 Error = new MCPError { Code = -32601, Message = "Resource read not implemented yet" }
-            };
+            });
         }
     }
 

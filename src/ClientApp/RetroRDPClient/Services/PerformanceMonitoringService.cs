@@ -30,8 +30,11 @@ namespace RetroRDPClient.Services
             try
             {
                 // Initialize performance counters if available
-                _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-                _cpuCounter.NextValue(); // First call always returns 0
+                if (OperatingSystem.IsWindows())
+                {
+                    _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                    _cpuCounter.NextValue(); // First call always returns 0
+                }
             }
             catch (Exception ex)
             {
@@ -225,7 +228,7 @@ namespace RetroRDPClient.Services
         {
             try
             {
-                return _cpuCounter?.NextValue() ?? 0;
+                return OperatingSystem.IsWindows() ? (_cpuCounter?.NextValue() ?? 0) : 0;
             }
             catch
             {
